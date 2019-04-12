@@ -57,9 +57,7 @@ def follow(X, alpha, Xl, LB, UB, sigma=0.001):
     return X
 
 ## Return the leader pigeon ##
-# Inputs: cost function array #
-# NB: minimises by default (argmin) #
-def get_leader(F, P):
+def get_leader(F):
     return np.argmin(F, axis = 0)
 
 def optimise(n, nw, max_iter, alpha, sigma, fcost, LB, UB, viz=False):
@@ -71,14 +69,13 @@ def optimise(n, nw, max_iter, alpha, sigma, fcost, LB, UB, viz=False):
         Z = fcost(np.vstack([X.flatten(), Y.flatten()]).T).reshape(X.shape)
 
 ## PUPI algorithm ##
-    #np.random.seed(19680801)       # Fixing random state for reproducibility
     tic = time.time()
     T = max_iter/4                  # Period of food supply
     P = create(LB, UB, n)           # Pigeon population
     fbest, xbest = np.Inf, np.zeros(len(LB))
     for i in range(max_iter):
         F = fcost(P) 
-        leader = get_leader(F, P)
+        leader = get_leader(F)
         if F[leader] < fbest:       # Keep track the best solution so far
             fbest, xbest = F[leader], np.copy(P[leader])
         if i % T == 0:              # Convert pigeons role
@@ -102,6 +99,6 @@ def optimise(n, nw, max_iter, alpha, sigma, fcost, LB, UB, viz=False):
     toc = time.time() - tic
     print("\n%s\nProblem: %s \nEllapsed time: %.2fs \nBest cost: %.10f \nBest solution/Leader: " \
           % ("-"*80, fcost.__name__, toc, fbest), xbest, P[leader])
-    return fcost.__name__, toc, fbest, xbest
+    return fcost.__name__, fbest, xbest, toc
 
 
