@@ -21,9 +21,10 @@ class PupiReal():
         self.d = len(LB)             # Problem dimensionality
         self.n = n                   # Population size (number of pigeons)
         self.nw = nw                 # Rate of walkers pigeons in the population
+        self.max_eval = max_eval     # Max number of cost function evaluations allowed
+        self.T = (max_eval/n)/10      # Period of food supply before exhaustion
         self.alpha = alpha           # Step size for followers move
         self.sigma = sigma           # Step size for walkers move
-        self.max_eval = max_eval     # Max number of cost function evaluations allowed
         self.mode = mode             # Boundary movement mode (clipped or toroid)
         self.viz = viz               # Plot pigeons movements flag (only for 2D problems)
         self.xbest = np.zeros(self.d)# The best solution found
@@ -68,11 +69,12 @@ class PupiReal():
         elif self.mode == 'toroid':
             for i in range(len(X)):
                 B = (self.UB - self.LB) + .1
-                X[i, :] = np.fmod(B + np.fmod((X[i, :] + self.sigma * np.random.randn(self.d)) - self.LB, B), B) + self.LB
+        #        X[i, :] = np.fmod(B + np.fmod((X[i, :] + self.sigma * np.random.randn(self.d)) - self.LB, B), B) + self.LB
+                X[i, :] = np.fmod(B + np.fmod((X[i, :] + self.sigma * (2*np.random.rand(self.d)-1)) - self.LB, B), B) + self.LB
         return X
 
     ## Move followers towards leader ##
-    def follow(self, X, Xl, sigma=0.001):
+    def follow(self, X, Xl, sigma=0.01):#sigma=0.001):
          for i in range(len(X)):
             # X[i, :] = X[i, :] + alpha*(Xl-X[i, :])
             X[i, :] = np.clip(X[i, :] + self.alpha * (Xl - X[i, :]) + sigma * np.random.randn(self.d), self.LB, self.UB)
@@ -83,19 +85,26 @@ class PupiReal():
         return np.argmin(F, axis=0)
 
     ## Assign pigeons roles, depending on period of food supply ##
-    def convert(self, i, T, followers, walkers):
-        if i % T == 0:          # Begin explotiation phase
+    def convert(self, i, followers, walkers):
+        if i % self.T == 0:             # Begin explotiation phase
             walkers = np.random.choice(self.n, int(self.n * self.nw), replace=False)
             followers = np.setdiff1d(range(self.n), walkers)
-        elif i % T > .8*T:    # Begin exploration phase
+        elif i % self.T > .9*self.T:    # Begin exploration phase
             walkers = np.arange(self.n)
             followers = []
         return followers, walkers
 
+    ## Genotype-phenotype mapping function, when direct mapping not applicable ##
+    def gpm(self, P):
+        return P                        # Direct mapping: Phenotype is the same genotype
+
     ## Print algorithm results ##
     def summary(self):
-        print("\n%s\nProblem: %s \nEllapsed time: %.2fs \nBest cost: %.10f \nBest solution: " \
-              % ("-" * 80, self.fcost.__name__, self.toc, self.fbest), self.xbest)
+        # print("\n%s\nProblem: %s \nEllapsed time: %.2fs \nBest cost: %.10f \nBest solution (genotype): " \
+        #       % ("-" * 80, self.fcost.__name__, self.toc, self.fbest), map(float, ["%.2f" % v for v in self.xbest]), self.gpm(self.xbest))
+        print("\n%s\nProblem: %s \nEllapsed time: %.2fs \nBest cost: %.2f " % ("-" * 80, self.fcost.__name__, self.toc, self.fbest))
+        print("Best solution (genotype): ", map(float, ["%.3f" % v for v in self.xbest]))
+        print("Best solution (phenotype): ", self.gpm(self.xbest))
 
     ## Get algorithm results ##
     def getResults(self):
@@ -107,24 +116,56 @@ class PupiReal():
 
     ## Optimisation algorithm ##
     def optimise(self):
-        if self.viz: self.vizSetup()                # Initialise visualisign settings
-        T = (self.max_eval/self.n)/4                # Set period of food supply
+        if self.viz: self.vizSetup()                # Initialise visualisation settings
         self.fbest, self.xbest = np.Inf, np.zeros(self.d)     # Initialise solution variables
         tic = time.time()                           # Start execution timer
         P, followers, walkers = self.create()       # Pigeon initial population
         for i in range(0, self.max_eval, self.n):   # Main loop
-            F = self.fcost(P)                       # Compute cost of current solution population
+            F = self.fcost(self.gpm(P))             # Compute cost of current solution population
             leader = self.getLeader(F)              # Find leader pigeon
-            if F[leader] < self.fbest:              # Trace the best solution so far
+            if F[leader] < self.fbest:              # Update best solution found
                 self.fbest, self.xbest, self.ibest = F[leader], np.copy(P[leader]), i
-            if self.stats:                          # Trace other statistics for current solution
+            followers, walkers = self.convert(i/self.n, followers, walkers)  # Set pigeon roles
+            P[followers] = self.follow(P[followers], P[leader])              # Move follower pigeons
+            P[walkers] = self.walk(P[walkers])                               # Move walker pigeons
+
+            ## Statistics collection and visualisation ##
+            if self.stats:
                 self.fmins.append(F[leader]); self.favgs.append(np.mean(F)); self.fmaxs.append(F[np.argmax(F, axis=0)])
-            followers, walkers = self.convert(i/self.n, T, followers, walkers)  # Set pigeon roles
-            P[followers] = self.follow(P[followers], P[leader])          # Move follower pigeons
-            P[walkers] = self.walk(P[walkers])                           # Move walker pigeons
-            if self.viz and not (i/self.n % 20):    # If visualisation, do it every 20 iterations
+            if self.viz and not (i / self.n % 20):  # If visualisation, do it every 20 iterations
                 self.vizIteration(i, P, followers, walkers, leader)
         self.toc = time.time() - tic
         return self.fcost.__name__, self.fbest, self.ibest, self.xbest, self.toc
+
+## End of class ##
+
+
+## PUPI algorithm: Binary-valued problems class implementation  ##
+class PupiBinary(PupiReal):
+
+    ## Initialization of class parameters ##
+    def __init__(self, fcost=oneMax, d=64, n=30, nw=.25, alpha=0.1, sigma=0.1, max_eval=40000, viz=True, stats=True):
+        # Set parameters in super-class, LB and UB are constrained to unit-interval #
+        PupiReal.__init__(self, fcost=fcost, LB=np.zeros(d), UB=np.ones(d), \
+                          n=n, nw=nw, alpha=alpha, sigma=sigma, max_eval=max_eval,  \
+                          mode='toroid', viz=viz, stats=stats)
+        self.T = (self.max_eval/self.n)/20          # Decrease period of food supply before exhaustion
+
+    ## Genotype-phenotype mapping function: Maps real unit-interval to binary values ##
+    def gpm(self, P):
+        return (P >= .5)*1     # Apply threshold and cast True/False values to 1/0
+
+    ## Visualise one iteration of optimisation algorithm ##
+    def vizIteration(self, i, P, followers, walkers, leader):
+        if self.d == 2:                         # If 2D, plot pigeons on surface
+            plt.contourf(self.X, self.Y, self.Z, 8, colors=('navy', 'royalblue', 'skyblue', 'greenyellow', 'yellow', 'darkorange', 'tomato', 'crimson', 'maroon'))
+            plt.scatter(P[followers, 0], P[followers, 1], marker='^', c='black')
+            plt.scatter(P[walkers, 0], P[walkers, 1], marker='d', c='darkgreen')
+            plt.scatter(P[leader, 0], P[leader, 1], marker='o', c='red')
+        elif self.d in np.arange(3, 11)**2:     # If perfect-square dimensions, plot solution as bitmap
+            m = int(np.sqrt(self.d))
+            plt.imshow(self.gpm(self.xbest).reshape(m, m), cmap=('PuBu'))#''binary'))
+        plt.title("Problem: %s / Evaluations: %d / Best cost so far: %.6f  " % (self.fcost.__name__, i, self.fbest))
+        plt.draw(); plt.pause(0.0000001); plt.clf()
 
 ## End of class ##
