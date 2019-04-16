@@ -1,7 +1,9 @@
 ## Needed libraries ##
 import numpy as np
 
-## Benchmark definitions (numpy implementation) ##
+## Benchmark definitions (numpy vectorised implementation) ##
+
+## Real-valued problems ##
 def sphere(X):
     return np.sum(X**2, axis=1)
 
@@ -19,3 +21,13 @@ def eggholder(X):
     Z = X[:,1]+47
     return (-Z * np.sin(np.sqrt((np.abs(X[:,0]/2 + Z)))) \
             -X[:,0] * np.sin(np.sqrt((np.abs(X[:,0] - Z))))) #+ 959.640662720851
+
+
+## Binary problems ##
+def oneMax(B):
+    return -np.sum(B, axis=1)
+
+def squareWave(B):
+    d = B.shape[1]; tau = int(np.sqrt(d))
+    S = -1 * (2 * (np.arange(d) / tau) - (2 * np.arange(d) / tau))
+    return [-np.sum(B_ == S) for B_ in B]
