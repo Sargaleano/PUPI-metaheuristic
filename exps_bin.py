@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 ## General settings ##
 np.random.seed(int(str(int(time.time() * 1000))[-8:-1]))  # (91680801)  # Set random state for reproducibility
-problems = [oneMax, squareWave]
+problems = [oneMax, squareWave, binVal]
 stats = []; nreps = 5
 
 ## PupiBinary experiments ##
@@ -28,7 +28,7 @@ if False:
     plt.title('Execution time secs: oneMax (PupiBinary)')
     plt.show()
 
-print("\n------- Stats: PupiBinary --------")
+print("\n------- PupiBinary: Summary of results --------")
 #print(stats)
 for problem in problems:
     print("Best costs (%s): " % problem.__name__, [results[1] for results in stats if results[0]==problem.__name__])
