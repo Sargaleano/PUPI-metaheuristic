@@ -164,7 +164,7 @@ class PupiBinary(PupiReal):
             plt.scatter(P[leader, 0], P[leader, 1], marker='o', c='red')
         elif self.d in np.arange(3, 11)**2:     # If perfect-square dimensions, plot solution as bitmap
             m = int(np.sqrt(self.d))
-            plt.imshow(self.gpm(self.xbest).reshape(m, m), cmap=('PuBu'))#''binary'))
+            plt.imshow(self.gpm(self.xbest).reshape(m, m), cmap=('PuBu'), vmin=0, vmax=1)
         plt.title("Problem: %s / Evaluations: %d / Best cost so far: %.6f  " % (self.fcost.__name__, i, self.fbest))
         plt.draw(); plt.pause(0.0000001); plt.clf()
 
