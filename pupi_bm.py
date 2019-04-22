@@ -1,4 +1,4 @@
-## Needed libraries ##
+""" A collection of binary-valued functions for benchmark optimisation algorithms """
 import numpy as np
 
 ## Benchmark definitions (numpy vectorised implementation) ##
@@ -24,10 +24,33 @@ def eggholder(X):
 
 
 ## Binary problems ##
+
 def oneMax(B):
+    """ oneMax counts the numbers of bits set in a given bitstring. Its maximum occurs when all d bits are set to 1.
+        NB. Since optimiser minimises by default, the sum is negated for maximisation purposes.
+        Arguments:
+        B -- a population of bitstrings of length d
+    """
     return -np.sum(B, axis=1)
 
 def squareWave(B):
+    """ squareWave computes the similarity of a bitstring to a periodic waveform of length d and period tau
+        consisting of instantaneous transitions between levels 0 and 1 every tau/2 bits. It is basically a discrete
+        version of a sin waveform, indeed it can be think of as the sign of the sin.
+        NB. Since optimiser minimises by default, the similarity is negated for maximisation purposes.
+        Arguments:
+        B -- a population of bitstrings of length d. It is suggested d being a perfect square so that tau = sqrt(d)
+    """
     d = B.shape[1]; tau = int(np.sqrt(d))
-    S = -1 * (2 * (np.arange(d) / tau) - (2 * np.arange(d) / tau))
+    S = -1 * (2 * (np.arange(d) // tau) - (2 * np.arange(d) // tau))
     return [-np.sum(B_ == S) for B_ in B]
+
+def binVal(B):
+    """ binVal obtains the decimal value of a given bitstring. Its maximum occurs when all d bits are set to 1.
+        NB. Since optimiser minimises by default, the value is negated for maximisation purposes.
+        Arguments:
+        B -- a population of bitstrings of length d
+    """
+    d = B.shape[1]
+    return -np.sum(np.multiply(2**np.arange(d)[::-1], B), axis=1)
+
