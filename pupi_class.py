@@ -22,7 +22,7 @@ class PupiReal():
         self.n = n                   # Population size (number of pigeons)
         self.nw = nw                 # Rate of walkers pigeons in the population
         self.max_eval = max_eval     # Max number of cost function evaluations allowed
-        self.T = (max_eval/n)/10      # Period of food supply before exhaustion
+        self.T = (max_eval/n)/10     # Period of food supply before exhaustion
         self.alpha = alpha           # Step size for followers move
         self.sigma = sigma           # Step size for walkers move
         self.mode = mode             # Boundary movement mode (clipped or toroid)
@@ -135,7 +135,7 @@ class PupiReal():
             if self.viz and not (i / self.n % 20):  # If visualisation, do it every 20 iterations
                 self.vizIteration(i, P, followers, walkers, leader)
         self.toc = time.time() - tic
-        return self.fcost.__name__, self.fbest, self.ibest, self.xbest, self.toc
+        return self.fcost.__name__, self.d, self.fbest, self.ibest, self.xbest, self.toc, self.n, self.alpha, self.sigma
 
 ## End of class ##
 
