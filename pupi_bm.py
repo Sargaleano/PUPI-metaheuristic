@@ -43,7 +43,7 @@ def squareWave(B):
     """
     d = B.shape[1]; tau = int(np.sqrt(d))
     S = -1 * (2 * (np.arange(d) // tau) - (2 * np.arange(d) // tau))
-    return [-np.sum(B_ == S) for B_ in B]
+    return np.array([-np.sum(B_ == S) for B_ in B])
 
 def binVal(B):
     """ binVal obtains the decimal value of a given bitstring. Its maximum occurs when all d bits are set to 1.
