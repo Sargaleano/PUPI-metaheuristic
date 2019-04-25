@@ -52,5 +52,6 @@ def binVal(B):
         B -- a population of bitstrings of length d
     """
     d = B.shape[1]
-    return -np.sum(np.multiply(2**np.arange(d)[::-1], B), axis=1)
+    # In the following line, use dtype=float to avoid overflow when d>=64 bits
+    return -np.sum(np.multiply(2**np.arange(d, dtype=np.float)[::-1], B), dtype=np.float, axis=1)
 
