@@ -108,7 +108,7 @@ class PupiReal():
 
     ## Get algorithm results ##
     def getResults(self):
-        return self.fcost.__name__, self.toc, self.fbest, self.ibest, self.xbest
+        return self.fcost.__name__, self.d, self.fbest, self.ibest, self.xbest, self.toc, self.n, self.alpha, self.sigma
 
     ## Get algorithm stats ##
     def getStats(self):
