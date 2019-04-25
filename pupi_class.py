@@ -68,7 +68,7 @@ class PupiReal():
                 X[i, :] = np.clip((X[i, :] + self.sigma * np.random.randn(self.d)), self.LB, self.UB)
         elif self.mode == 'toroid':
             for i in range(len(X)):
-                B = (self.UB - self.LB) + .1
+                B = (self.UB - self.LB) + .01
         #        X[i, :] = np.fmod(B + np.fmod((X[i, :] + self.sigma * np.random.randn(self.d)) - self.LB, B), B) + self.LB
                 X[i, :] = np.fmod(B + np.fmod((X[i, :] + self.sigma * (2*np.random.rand(self.d)-1)) - self.LB, B), B) + self.LB
         return X
@@ -102,7 +102,7 @@ class PupiReal():
     def summary(self):
         # print("\n%s\nProblem: %s \nEllapsed time: %.2fs \nBest cost: %.10f \nBest solution (genotype): " \
         #       % ("-" * 80, self.fcost.__name__, self.toc, self.fbest), map(float, ["%.2f" % v for v in self.xbest]), self.gpm(self.xbest))
-        print("\n%s\nProblem: %s \nEllapsed time: %.2fs \nBest cost: %.2f " % ("-" * 80, self.fcost.__name__, self.toc, self.fbest))
+        print("\n%s\nProblem: %s (d=%d)\nEllapsed time: %.2fs \nBest cost: %.2f " % ("-" * 80, self.fcost.__name__, self.d, self.toc, self.fbest))
         print("Best solution (genotype): ", map(float, ["%.3f" % v for v in self.xbest]))
         print("Best solution (phenotype): ", self.gpm(self.xbest))
 
@@ -135,7 +135,6 @@ class PupiReal():
             if self.viz and not (i / self.n % 20):  # If visualisation, do it every 20 iterations
                 self.vizIteration(i, P, followers, walkers, leader)
         self.toc = time.time() - tic
-        return self.fcost.__name__, self.d, self.fbest, self.ibest, self.xbest, self.toc, self.n, self.alpha, self.sigma
 
 ## End of class ##
 
@@ -155,17 +154,18 @@ class PupiBinary(PupiReal):
     def gpm(self, P):
         return (P >= .5)*1     # Apply threshold and cast True/False values to 1/0
 
+    ## Get algorithm results ##
+    def getResults(self):
+        return self.fcost.__name__, self.d, self.fbest, self.ibest, self.gpm(self.xbest), self.toc, self.n, self.alpha, self.sigma
+
     ## Visualise one iteration of optimisation algorithm ##
     def vizIteration(self, i, P, followers, walkers, leader):
         if self.d == 2:                         # If 2D, plot pigeons on surface
-            plt.contourf(self.X, self.Y, self.Z, 8, colors=('navy', 'royalblue', 'skyblue', 'greenyellow', 'yellow', 'darkorange', 'tomato', 'crimson', 'maroon'))
-            plt.scatter(P[followers, 0], P[followers, 1], marker='^', c='black')
-            plt.scatter(P[walkers, 0], P[walkers, 1], marker='d', c='darkgreen')
-            plt.scatter(P[leader, 0], P[leader, 1], marker='o', c='red')
+            PupiReal.vizIteration(self, i, P, followers, walkers, leader)
         elif self.d in np.arange(3, 11)**2:     # If perfect-square dimensions, plot solution as bitmap
             m = int(np.sqrt(self.d))
             plt.imshow(self.gpm(self.xbest).reshape(m, m), cmap=('PuBu'), vmin=0, vmax=1)
-        plt.title("Problem: %s / Evaluations: %d / Best cost so far: %.6f  " % (self.fcost.__name__, i, self.fbest))
-        plt.draw(); plt.pause(0.0000001); plt.clf()
+            plt.title("Problem: %s / Evaluations: %d / Best cost so far: %.2f  " % (self.fcost.__name__, i, self.fbest))
+            plt.draw(); plt.pause(0.0000001); plt.clf()
 
 ## End of class ##
