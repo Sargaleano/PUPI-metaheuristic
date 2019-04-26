@@ -5,6 +5,10 @@ import numpy as np
 import time
 import csv
 
+import platform
+print("Python version: " +platform.python_version())
+print("Numpy version: " + np.__version__)
+
 ## General settings ##
 np.random.seed(int(time.time()))  # (91680801)  # Set random state for reproducibility
 problems = [oneMax, squareWave, binVal]
