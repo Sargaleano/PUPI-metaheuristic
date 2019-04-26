@@ -6,7 +6,7 @@ import time
 import csv
 
 import platform
-print("Python version: " +platform.python_version())
+print("Python version: " + platform.python_version())
 print("Numpy version: " + np.__version__)
 
 ## General settings ##
@@ -18,7 +18,7 @@ nwrates = [.25, .50, .75]
 evals = [10000, 20000, 40000]
 alphas = [.01, .1, .5]
 sigmas = [.01, .1, .5]
-nreps = 100
+nreps = 30
 
 ## d ##
 stats = [];
@@ -73,7 +73,7 @@ stats = [];
 for problem in problems:
     for max_eval in evals:
         for nrep in range(nreps):
-            pupi = PupiBinary(fcost=problem, d=36, n=40, nr=0.25, max_eval=max_eval, viz=False)
+            pupi = PupiBinary(fcost=problem, d=36, n=40, nw=0.25, max_eval=max_eval, viz=False)
             pupi.optimise()
             stats.append(pupi.getResults())
             pupi.summary()
@@ -89,7 +89,7 @@ stats = [];
 for problem in problems:
     for max_eval in evals:
         for nrep in range(nreps):
-            pupi = PupiBinary(fcost=problem, d=64, n=40, nr=0.25, max_eval=max_eval, viz=False)
+            pupi = PupiBinary(fcost=problem, d=64, n=40, nw=0.25, max_eval=max_eval, viz=False)
             pupi.optimise()
             stats.append(pupi.getResults())
             pupi.summary()
@@ -105,7 +105,7 @@ stats = [];
 for problem in problems:
     for max_eval in evals:
         for nrep in range(nreps):
-            pupi = PupiBinary(fcost=problem, d=100, n=80, nr=0.25, max_eval=max_eval, viz=False)
+            pupi = PupiBinary(fcost=problem, d=100, n=80, nw=0.25, max_eval=max_eval, viz=False)
             pupi.optimise()
             stats.append(pupi.getResults())
             pupi.summary()
