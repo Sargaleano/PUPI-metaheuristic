@@ -14,7 +14,7 @@ class PupiReal():
 
     ## Initialization of class parameters ##
     def __init__(self, fcost=sphere, LB=np.array([-5.,-5.]), UB=np.array([5.,5.]), \
-                 n=20, nw=.25, alpha=0.01, sigma=0.1, max_eval=40000, mode='clipped', viz=False, stats=False):
+                 n=20, nw=.25, alpha=0.01, sigma=0.1, max_eval=40000, mode='clipped', viz=True, stats=False):
         self.fcost = fcost           # Cost function (problem) to be optimised
         self.LB = LB                 # Array of variable lower bound in each dimension
         self.UB = UB                 # Array of variable upper bound in each dimension
@@ -103,7 +103,7 @@ class PupiReal():
         # print("\n%s\nProblem: %s \nEllapsed time: %.2fs \nBest cost: %.10f \nBest solution (genotype): " \
         #       % ("-" * 80, self.fcost.__name__, self.toc, self.fbest), map(float, ["%.2f" % v for v in self.xbest]), self.gpm(self.xbest))
         print("\n%s\nProblem: %s (d=%d)\nEllapsed time: %.2fs \nBest cost: %.2f " % ("-" * 80, self.fcost.__name__, self.d, self.toc, self.fbest))
-        print("Best solution (genotype): ", map(float, ["%.3f" % v for v in self.xbest]))
+        print("Best solution (genotype): ", list(map(float, ["%.3f" % v for v in self.xbest])))
         print("Best solution (phenotype): ", self.gpm(self.xbest))
 
     ## Get algorithm results ##
@@ -143,7 +143,7 @@ class PupiReal():
 class PupiBinary(PupiReal):
 
     ## Initialization of class parameters ##
-    def __init__(self, fcost=oneMax, d=64, n=30, nw=.25, alpha=0.1, sigma=0.1, max_eval=40000, viz=True, stats=True):
+    def __init__(self, fcost=oneMax, d=64, n=30, nw=0.1, alpha=0.1, sigma=0.1, max_eval=40000, viz=True, stats=True):
         # Set parameters in super-class, LB and UB are constrained to unit-interval #
         PupiReal.__init__(self, fcost=fcost, LB=np.zeros(d), UB=np.ones(d), \
                           n=n, nw=nw, alpha=alpha, sigma=sigma, max_eval=max_eval,  \
@@ -156,7 +156,7 @@ class PupiBinary(PupiReal):
 
     ## Get algorithm results ##
     def getResults(self):
-        return self.fcost.__name__, self.d, self.fbest, self.ibest, self.gpm(self.xbest), self.toc, self.n, self.alpha, self.sigma
+        return self.fcost.__name__, self.d, self.fbest, self.ibest, self.gpm(self.xbest), self.toc, self.n, self.alpha, self.sigma, self.max_eval
 
     ## Visualise one iteration of optimisation algorithm ##
     def vizIteration(self, i, P, followers, walkers, leader):
@@ -166,6 +166,12 @@ class PupiBinary(PupiReal):
             m = int(np.sqrt(self.d))
             plt.imshow(self.gpm(self.xbest).reshape(m, m), cmap=('PuBu'), vmin=0, vmax=1)
             plt.title("Problem: %s / Evaluations: %d / Best cost so far: %.2f  " % (self.fcost.__name__, i, self.fbest))
+
+            # plt.rcParams.update({'font.size': 20})
+            # plt.xticks([0,1,2,3,4,5,6,7]); plt.yticks([0,1,2,3,4,5,6,7])
+            # plt.rcParams.update({'savefig.bbox': 'tight'})
+            # if i in [600, 6000, 18000, 39600]: print("Saving..."); plt.savefig("results/bmp-%s-%d.png" % (self.fcost.__name__, i), dpi=300)
+
             plt.draw(); plt.pause(0.0000001); plt.clf()
 
 ## End of class ##

@@ -8,12 +8,12 @@ import matplotlib.pyplot as plt
 ## General settings ##
 np.random.seed(int(str(int(time.time() * 1000))[-8:-1]))  # (91680801)  # Set random state for reproducibility
 problems = [oneMax, squareWave, binVal]
-stats = []; nreps = 5
+stats = []; nreps = 10
 
 ## PupiBinary experiments ##
 for k in range(nreps):
     for problem in problems:
-        pupi = PupiBinary(fcost=problem, d=64, viz=True)
+        pupi = PupiBinary(fcost=problem, d=64, nw=.1, viz=False)
         pupi.optimise()
         stats.append(pupi.getResults())
         pupi.summary()

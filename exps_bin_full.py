@@ -14,7 +14,7 @@ np.random.seed(int(time.time()))  # (91680801)  # Set random state for reproduci
 problems = [oneMax, squareWave, binVal]
 dims = [16, 25, 36, 64, 100]
 popsize = [20, 40, 80]
-nwrates = [.25, .50, .75]
+nwrates = [.1, .25, .50]
 evals = [10000, 20000, 40000]
 alphas = [.01, .1, .5]
 sigmas = [.01, .1, .5]
@@ -63,7 +63,7 @@ for problem in problems:
             pupi.summary()
 #print(stats)
 
-with open('results/bin-nrates.csv', 'w') as writeFile:
+with open('results/bin-nwrates.csv', 'w') as writeFile:
     writer = csv.writer(writeFile)
     writer.writerows(stats)
 writeFile.close()
@@ -73,7 +73,7 @@ stats = [];
 for problem in problems:
     for max_eval in evals:
         for nrep in range(nreps):
-            pupi = PupiBinary(fcost=problem, d=36, n=40, nw=0.25, max_eval=max_eval, viz=False)
+            pupi = PupiBinary(fcost=problem, d=36, n=40, max_eval=max_eval, viz=False)
             pupi.optimise()
             stats.append(pupi.getResults())
             pupi.summary()
@@ -89,7 +89,7 @@ stats = [];
 for problem in problems:
     for max_eval in evals:
         for nrep in range(nreps):
-            pupi = PupiBinary(fcost=problem, d=64, n=40, nw=0.25, max_eval=max_eval, viz=False)
+            pupi = PupiBinary(fcost=problem, d=64, n=40, max_eval=max_eval, viz=False)
             pupi.optimise()
             stats.append(pupi.getResults())
             pupi.summary()
@@ -100,16 +100,16 @@ with open('results/bin-evals-64.csv', 'w') as writeFile:
     writer.writerows(stats)
 writeFile.close()
 
-## evals; d=100 ##
+# evals; d=100 ##
 stats = [];
 for problem in problems:
     for max_eval in evals:
         for nrep in range(nreps):
-            pupi = PupiBinary(fcost=problem, d=100, n=80, nw=0.25, max_eval=max_eval, viz=False)
+            pupi = PupiBinary(fcost=problem, d=100, n=80, max_eval=max_eval, viz=False)
             pupi.optimise()
             stats.append(pupi.getResults())
             pupi.summary()
-#print(stats)
+print(stats)
 
 with open('results/bin-evals-100.csv', 'w') as writeFile:
     writer = csv.writer(writeFile)
