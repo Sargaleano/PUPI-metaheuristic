@@ -14,7 +14,7 @@ class PupiReal():
 
     ## Initialization of class parameters ##
     def __init__(self, fcost=sphere, LB=np.array([-5.,-5.]), UB=np.array([5.,5.]), \
-                 n=20, nw=.25, alpha=0.01, sigma=0.1, max_eval=40000, mode='clipped', viz=True, stats=False):
+                 n=40, nw=.25, alpha=0.01, sigma=0.1, max_eval=40000, mode='clipped', viz=False, stats=False):
         self.fcost = fcost           # Cost function (problem) to be optimised
         self.LB = LB                 # Array of variable lower bound in each dimension
         self.UB = UB                 # Array of variable upper bound in each dimension
@@ -108,7 +108,7 @@ class PupiReal():
 
     ## Get algorithm results ##
     def getResults(self):
-        return self.fcost.__name__, self.d, self.fbest, self.ibest, self.xbest, self.toc, self.n, self.alpha, self.sigma
+        return self.fcost.__name__, self.d, self.fbest, self.ibest, self.xbest, self.toc, self.n, self.nw, self.alpha, self.sigma, self.max_eval, self.mode
 
     ## Get algorithm stats ##
     def getStats(self):
@@ -156,7 +156,7 @@ class PupiBinary(PupiReal):
 
     ## Get algorithm results ##
     def getResults(self):
-        return self.fcost.__name__, self.d, self.fbest, self.ibest, self.gpm(self.xbest), self.toc, self.n, self.alpha, self.sigma, self.max_eval
+        return self.fcost.__name__, self.d, self.fbest, self.ibest, self.gpm(self.xbest), self.toc, self.n, self.nw, self.alpha, self.sigma, self.max_eval, self.mode
 
     ## Visualise one iteration of optimisation algorithm ##
     def vizIteration(self, i, P, followers, walkers, leader):
@@ -166,12 +166,11 @@ class PupiBinary(PupiReal):
             m = int(np.sqrt(self.d))
             plt.imshow(self.gpm(self.xbest).reshape(m, m), cmap=('PuBu'), vmin=0, vmax=1)
             plt.title("Problem: %s / Evaluations: %d / Best cost so far: %.2f  " % (self.fcost.__name__, i, self.fbest))
-
             # plt.rcParams.update({'font.size': 20})
             # plt.xticks([0,1,2,3,4,5,6,7]); plt.yticks([0,1,2,3,4,5,6,7])
             # plt.rcParams.update({'savefig.bbox': 'tight'})
             # if i in [600, 6000, 18000, 39600]: print("Saving..."); plt.savefig("results/bmp-%s-%d.png" % (self.fcost.__name__, i), dpi=300)
-
             plt.draw(); plt.pause(0.0000001); plt.clf()
 
 ## End of class ##
+
