@@ -11,8 +11,12 @@ def rosenbrock(X):
     return (1 - X[:,0])**2 + 100 * (X[:,1] - (X[:,0]**2))**2
 
 def rastrigin(X):
-    d = X.shape[1]      # Space dimensionality
+    d = X.shape[1]      # Search space dimensionality
     return np.sum((X**2 - 10*np.cos(2*np.pi*X)), axis=1) + 10*d
+
+def rastrigin_offset(X):
+    d = X.shape[1]      # Search space dimensionality
+    return np.sum(((X-1.123)**2 - 10*np.cos(2*np.pi*(X-1.123))), axis=1) + 10*d
 
 def himmelblau(X):
     return (X[:,0]**2 + X[:,1] - 11)**2 + (X[:,0] + X[:,1]**2 - 7)**2
@@ -55,3 +59,13 @@ def binVal(B):
     # In the following line, use dtype=float to avoid overflow when d>=64 bits
     return -np.sum(np.multiply(2**np.arange(d, dtype=np.float)[::-1], B), dtype=np.float, axis=1)
 
+def powSum(B):
+    """ powSum obtains the sum of the exponents of the powers of two (or loci) that are set to one in a bitstring.
+        Its maximum occurs when all d bits are set to 1.
+        NB. Since optimiser minimises by default, the value is negated for maximisation purposes.
+        Arguments:
+        B -- a population of bitstrings of length d
+    """
+    d = B.shape[1]
+    # In the following line, use dtype=float to avoid overflow when d>=64 bits
+    return -np.sum(np.multiply(np.arange(1, d+1, dtype=np.float)[::-1], B), dtype=np.float, axis=1)
