@@ -67,10 +67,11 @@ class PupiReal():
                 X[i, j] = np.clip((X[i, j] + self.sigma * np.random.randn()), self.LB[j], self.UB[j])
         elif self.mode == 'toroid':
             for i in range(len(X)):
-                B = (self.UB - self.LB) + .1
-        #        X[i, :] = np.fmod(B + np.fmod((X[i, :] + self.sigma * np.random.randn(self.d)) - self.LB, B), B) + self.LB
+               # B = (self.UB - self.LB) + .1
+               # X[i, :] = np.fmod(B + np.fmod((X[i, :] + self.sigma * np.random.randn(self.d)) - self.LB, B), B) + self.LB
                 j = np.random.choice(self.d, 1)[0]  # Choose a coordinate to update
-                X[i, j] = np.fmod(B + np.fmod((X[i, j] + self.sigma * (2*np.random.rand()-1)) - self.LB, B), B) + self.LB
+                B = (self.UB[j] - self.LB[j]) + .1
+                X[i, j] = np.fmod(B + np.fmod((X[i, j] + self.sigma * (2*np.random.rand()-1)) - self.LB[j], B), B) + self.LB[j]
         return X
 
     ## Move followers towards leader ##
