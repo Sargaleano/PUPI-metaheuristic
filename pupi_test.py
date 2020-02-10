@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 np.random.seed(int(str(int(time.time() * 1000))[-8:-1]))  # Set random generator seed
 # viz = True        # Visualisation on
 viz = False         # Visualisation off
-nreps = 5           # Set number of experiment repetitions
+nreps = 10           # Set number of experiment repetitions
 
 #### Continuous-valued experiments ####
 
