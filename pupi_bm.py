@@ -76,11 +76,11 @@ def powSum(B):
 
 def knapsack_neglect(B):
     """ knapsack_neglect """
-    if (weight_ítem * B) <= capacity_knapsack:
+    if (weight_item * B) <= capacity_knapsack:
 
-        return np.sum((profit_ítem*B), axis=1)
+        return np.sum((profit_item*B), axis=1)
     else:
         return -10000000
 def knapsack_penalty(B):
     """ knapsack_penalty """
-    return (np.sum((profit_ítem*B), axis=1) - (np.sum((weight_ítem), axis=1)*abs(-capacity_knapsack+np.sum((weight_ítem*B), axis=1))))
+    return (np.sum((profit_item*B), axis=1) - (np.sum((weight_item), axis=1)*abs(-capacity_knapsack+np.sum((weight_item*B), axis=1))))
