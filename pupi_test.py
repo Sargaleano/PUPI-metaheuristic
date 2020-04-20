@@ -4,6 +4,8 @@ from pupi_bm import *
 import numpy as np
 import time
 import matplotlib.pyplot as plt
+import csv
+import pandas as pd
 
 np.random.seed(int(str(int(time.time() * 1000))[-8:-1]))  # Set random generator seed
 # viz = True        # Visualisation on
@@ -62,4 +64,22 @@ for i in range(0, nreps):
         pupib.optimise()
         pupib.summary()
 
+#### Binary-Knapsack experiments ####
+problems = [knapsack_neglect,knapsack_penalty]
 
+def knapsack_instance(filename):
+    myfile = open(filename)
+    mytxt = myfile.readline().split()
+    n_ítems= mytxt[0]
+    capacity_knapsack=mytxt[1]
+    data=np.loadtxt(filename,skiprows=1,dtype=int)
+    profit_ítem=data[:,0]
+    weight_ítem=data[:,1]
+    print("the solution for the problem with this parameters","#_ítems=",n_ítems,"capacity_knapsack=",capacity_knapsack,"weight_ítem=",weight_ítem,"profit_ítem=",profit_ítem,"is:")
+
+knapsack_instance('f4_l-d_kp_4_11.txt')
+
+for problem in problems:
+    pupib = PupiBinary(fcost=problem, d=4,n=4, nw=.1, alpha=.5, sigma=1, max_eval=50000, viz=viz)
+    pupib.optimise()
+    pupib.summary()
