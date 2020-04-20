@@ -73,9 +73,9 @@ def knapsack_instance(filename):
     n_ítems= mytxt[0]
     capacity_knapsack=mytxt[1]
     data=np.loadtxt(filename,skiprows=1,dtype=int)
-    profit_ítem=data[:,0]
-    weight_ítem=data[:,1]
-    print("the solution for the problem with this parameters","#_ítems=",n_ítems,"capacity_knapsack=",capacity_knapsack,"weight_ítem=",weight_ítem,"profit_ítem=",profit_ítem,"is:")
+    profit_item=data[:,0]
+    weight_item=data[:,1]
+    print("the solution for the problem with this parameters","#_ítems=",n_items,"capacity_knapsack=",capacity_knapsack,"weight_ítem=",weight_item,"profit_ítem=",profit_item,"is:")
 
 knapsack_instance('f4_l-d_kp_4_11.txt')
 
