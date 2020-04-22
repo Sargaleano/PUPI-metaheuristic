@@ -74,8 +74,8 @@ def knapsack_instance(filename):
     n_items= mytxt[0]
     capacity_knapsack = mytxt[1]
     data=np.loadtxt(filename,skiprows=1,dtype=int)
-    profit_item=data[:,0]
-    weight_item=data[:,1]
+    profit_item=np.array(data[:,0])
+    weight_item=np.array(data[:,1])
     print("the solution for the problem with this parameters","#_items=",n_items,"//n""capacity_knapsack=",capacity_knapsack,"weight_item=",weight_item,"profit_item=",profit_item,"is:")
 
 for problem in problems:
