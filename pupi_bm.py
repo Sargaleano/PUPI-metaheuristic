@@ -74,13 +74,12 @@ def powSum(B):
     # In the following line, use dtype=float to avoid overflow when d>=64 bits
     return -np.sum(np.multiply(np.arange(1, d+1, dtype=np.float)[::-1], B), dtype=np.float, axis=1)
 
-def knapsack_neglect(B, weight_item, profit_item, capacity_knapsack):
+def knapsack_neglect(B,  capacity_knapsack=11,weight_item=np.array([2,4,6,7]), profit_item=np.array([6,10,12,13])):
     """ knapsack_neglect """
-    if (weight_item * B) <= capacity_knapsack:
-
-        return np.sum((profit_item*B), axis=1)
+    if weight_item.sum() <= capacity_knapsack:
+        return np.sum((profit_item * B), axis=1)
     else:
         return -10000000
-def knapsack_penalty(B, weight_item, profit_item, capacity_knapsack):
-    """ knapsack_penalty """
-    return (np.sum((profit_item*B), axis=1) - (np.sum((weight_item), axis=1)*abs(-capacity_knapsack+np.sum((weight_item*B), axis=1))))
+def knapsack_penalty(B, capacity_knapsack=11,weight_item=np.array([2,4,6,7]), profit_item=np.array([6,10,12,13])):
+    """ knapsack_penalty"""
+    return (np.sum((profit_item * B), axis=1) - (np.sum((weight_item), axis=1)*abs(- capacity_knapsack + np.sum((weight_item*B), axis=1))))
