@@ -2,15 +2,16 @@
 from pupi_class import PupiReal, PupiBinary
 from pupi_bm import *
 import numpy as np
-import time
-import matplotlib.pyplot as plt
-import csv
 import pandas as pd
+import time
+import csv
+import matplotlib.pyplot as plt
 
 np.random.seed(int(str(int(time.time() * 1000))[-8:-1]))  # Set random generator seed
 # viz = True        # Visualisation on
 viz = False         # Visualisation off
 nreps = 5           # Set number of experiment repetitions
+
 
 #### Continuous-valued experiments ####
 
@@ -70,16 +71,15 @@ problems = [knapsack_neglect,knapsack_penalty]
 def knapsack_instance(filename):
     myfile = open(filename)
     mytxt = myfile.readline().split()
-    n_ítems= mytxt[0]
-    capacity_knapsack=mytxt[1]
+    n_items= mytxt[0]
+    capacity_knapsack = mytxt[1]
     data=np.loadtxt(filename,skiprows=1,dtype=int)
-    profit_item=data[:,0]
-    weight_item=data[:,1]
-    print("the solution for the problem with this parameters","#_ítems=",n_items,"capacity_knapsack=",capacity_knapsack,"weight_ítem=",weight_item,"profit_ítem=",profit_item,"is:")
-
-knapsack_instance('f4_l-d_kp_4_11.txt')
+    profit_item=np.array(data[:,0])
+    weight_item=np.array(data[:,1])
+    print("the solution for the problem with this parameters","#_items=",n_items,"//n""capacity_knapsack=",capacity_knapsack,"weight_item=",weight_item,"profit_item=",profit_item,"is:")
 
 for problem in problems:
-    pupib = PupiBinary(fcost=problem, d=4,n=4, nw=.1, alpha=.5, sigma=1, max_eval=50000, viz=viz)
+    knapsack_instance('f4_l-d_kp_4_11.txt')
+    pupib = PupiBinary(fcost=problem, d=4,n=4, nw=.1, alpha=.5, sigma=1, max_eval=50000, viz=viz, capacity_knapsack=11, weight_item=np.array([2,4,6,7]), profit_item=np.array([6,10,12,13]))
     pupib.optimise()
     pupib.summary()
