@@ -20,8 +20,7 @@ License: CC BY-SA 4.0
 class PupiReal():
 
     ## Initialization of class parameters ##
-    def __init__(self, fcost=sphere, LB=np.array([-5.,-5.]), UB=np.array([5.,5.]), \
-                 n=40, nw=.25, alpha=0.1, sigma=0.1, max_eval=40000, mode='clipped', viz=False, stats=False):
+    def __init__(self, fcost=sphere, LB=np.array([-5.,-5.]), UB=np.array([5.,5.]), capacity_knapsack=11,weight_item=np.array([2,4,6,7]), profit_item=np.array([6,10,12,13]), n=40, nw=.25, alpha=0.1, sigma=0.1, max_eval=40000, mode='clipped', viz=False, stats=False):
         self.fcost = fcost           # Cost function (problem) to be optimised
         self.LB = LB                 # Array of variable lower bound in each dimension
         self.UB = UB                 # Array of variable upper bound in each dimension
@@ -40,6 +39,9 @@ class PupiReal():
         self.toc = 0                 # Timing counter
         self.stats = stats           # Record solution statistics per iteration flag
         self.fmins = []; self.favgs = []; self.fmaxs = [] # Holders for solution statistics per iteration
+        self.weight_item = weight_item #weigh_item para knapsack
+        self.profit_item = profit_item #profit_item para knapsack
+        self.capacity_knapsack = capacity_knapsack #capacity_knapsack para knapsack
 
     ## Core function: Assign pigeons roles, depending on availability of food supply (starvation) ##
     def setRoles(self, starvation=False):
@@ -185,11 +187,13 @@ class PupiReal():
 class PupiBinary(PupiReal):
 
     ## Initialization of class parameters ##
-    def __init__(self, fcost=oneMax, d=64, n=20, nw=0.25, alpha=0.1, sigma=1, max_eval=40000, viz=True, stats=True):
+    def __init__(self, fcost=oneMax, d=64, n=20, nw=0.25, alpha=0.1, sigma=1, max_eval=40000, viz=True, stats=True, capacity_knapsack=11, weight_item=np.array([2,4,6,7]), profit_item=np.array([6,10,12,13])):
         # Set parameters in super-class, LB and UB are constrained to unit-interval #
+        self.weight_item = weight_item #weigh_item para knapsack
+        self.profit_item = profit_item #profit_item para knapsack
+        self.capacity_knapsack = capacity_knapsack #capacity_knapsack para knapsack
         PupiReal.__init__(self, fcost=fcost, LB=np.zeros(d), UB=np.ones(d), n=n, nw=nw, \
-                          alpha=alpha, sigma=sigma, max_eval=max_eval, mode='toroid', viz=viz, stats=stats)
-
+                          alpha=alpha, sigma=sigma, max_eval=max_eval, mode='toroid', viz=viz, stats=stats, capacity_knapsack=11, weight_item=np.array([2,4,6,7]), profit_item=np.array([6,10,12,13]))
     ## Core function: Genotype-phenotype mapping function: Maps real unit-interval to binary values ##
     def gpm(self, P):
         return (P >= .5)*1     # Apply threshold and cast True/False values to 1/0
