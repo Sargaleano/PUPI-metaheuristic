@@ -79,7 +79,7 @@ def knapsack_instance(filename):
     print("the solution for the problem with this parameters","#_items=",n_items,"//n""capacity_knapsack=",capacity_knapsack,"weight_item=",weight_item,"profit_item=",profit_item,"is:")
 	problems = [knapsack_neglect,knapsack_penalty]
 	for problem in problems:
-        knapsack_instance('f4_l-d_kp_4_11.txt')
-        pupib = PupiBinary(fcost=problem, d=4,n=4, nw=.1, alpha=.5, sigma=1, max_eval=50000, viz=viz, capacity_knapsack=11, weight_item=np.array([2,4,6,7]), profit_item=np.array([6,10,12,13]))
-        pupib.optimise()
-        pupib.summary()
+		pupib = PupiBinary(fcost=problem, d=4,n=4, nw=.1, alpha=.5, sigma=1, max_eval=50000, viz=viz, capacity_knapsack=11, weight_item=np.array([2,4,6,7]), profit_item=np.array([6,10,12,13]))
+		pupib.optimise()
+		pupib.summary()
+knapsack_instance('f4_l-d_kp_4_11.txt')
