@@ -2,84 +2,98 @@
 from pupi_class import PupiReal, PupiBinary
 from pupi_bm import *
 import numpy as np
-import pandas as pd
 import time
-import csv
+from timeit import timeit
+import pandas as pd
 import matplotlib.pyplot as plt
+import zipfile
 
 np.random.seed(int(str(int(time.time() * 1000))[-8:-1]))  # Set random generator seed
-# viz = True        # Visualisation on
-viz = False         # Visualisation off
-nreps = 5           # Set number of experiment repetitions
+viz = True        # Visualisation on
+# viz = False         # Visualisation off
+nreps = 1 #5           # Set number of experiment repetitions
 
+if(False):
+    #### Continuous-valued experiments ####
 
-#### Continuous-valued experiments ####
+    # 2D problems #
+    problems = [rastrigin, rastrigin_offset, rastrigin_bipolar, rosenbrock, himmelblau, sphere]
+    for i in range(0, nreps):
+        for problem in problems:
+            pupic = PupiReal(fcost=problem, viz=viz)
+            pupic.optimise()
+            pupic.summary()
 
-# 2D problems #
-problems = [rastrigin, rastrigin_offset, rastrigin_bipolar, rosenbrock, himmelblau, sphere]
-for i in range(0, nreps):
+    # Eggholder 2D problem has different bounds and therefore step sizes #
+        pupic = PupiReal(fcost=eggholder, LB=np.array([-512., -512.]), UB=np.array([512., 512.]), alpha=.9, sigma=50, viz=viz, mode='clipped', nw=.4)
+        pupic.optimise()
+        pupic.summary()
+    # quit(1)
+
+    # 10D problems #
+    d = 10
+    UB = np.repeat(5., d); LB = -UB
+    problems = [sphere, rastrigin, rastrigin_offset, rastrigin_bipolar]
     for problem in problems:
-        pupic = PupiReal(fcost=problem, viz=viz)
+        pupic = PupiReal(fcost=problem, LB=LB, UB=UB, max_eval=100000, n=20, nw=.1, alpha=.1, sigma=1)
         pupic.optimise()
         pupic.summary()
 
-# Eggholder 2D problem has different bounds and therefore step sizes #
-    pupic = PupiReal(fcost=eggholder, LB=np.array([-512., -512.]), UB=np.array([512., 512.]), alpha=.9, sigma=50, viz=viz, mode='clipped', nw=.4)
-    pupic.optimise()
-    pupic.summary()
-# quit(1)
-
-# 10D problems #
-d = 10
-UB = np.repeat(5., d); LB = -UB
-problems = [sphere, rastrigin, rastrigin_offset, rastrigin_bipolar]
-for problem in problems:
-    pupic = PupiReal(fcost=problem, LB=LB, UB=UB, max_eval=100000, n=20, nw=.1, alpha=.1, sigma=1)
-    pupic.optimise()
-    pupic.summary()
-
-# 30D problems #
-d = 30
-UB = np.repeat(5., d); LB = -UB
-problems = [sphere, rastrigin, rastrigin_offset, rastrigin_bipolar]
-for problem in problems:
-    pupic = PupiReal(fcost=problem, LB=LB, UB=UB, max_eval=300000, n=20, nw=.1, alpha=.1, sigma=1)
-    pupic.optimise()
-    pupic.summary()
-
-
-#### Binary-valued experiments ####
-
-problems = [oneMax, squareWave, powSum] #, binVal]
-
-for i in range(0, nreps):
-    # 100D problems #
+    # 30D problems #
+    d = 30
+    UB = np.repeat(5., d); LB = -UB
+    problems = [sphere, rastrigin, rastrigin_offset, rastrigin_bipolar]
     for problem in problems:
-        pupib = PupiBinary(fcost=problem, d=100, n=40, nw=.1, alpha=.5, sigma=1, max_eval=50000, viz=viz)
-        pupib.optimise()
-        pupib.summary()
-
-    # 400D problems #
-    for problem in problems:
-        pupib = PupiBinary(fcost=problem, d=400, n=20, nw=.1, alpha=.5, sigma=1, max_eval=100000)
-        pupib.optimise()
-        pupib.summary()
-
-#### Binary-Knapsack experiments ####
+        pupic = PupiReal(fcost=problem, LB=LB, UB=UB, max_eval=300000, n=20, nw=.1, alpha=.1, sigma=1)
+        pupic.optimise()
+        pupic.summary()
 
 
-def knapsack_instance(filename):
-    myfile = open(filename)
-    mytxt = myfile.readline().split()
-    n_items= mytxt[0]
-    capacity_knapsack = mytxt[1]
-    data=np.loadtxt(filename,skiprows=1,dtype=int)
-    profit_item=np.array(data[:,0])
-    weight_item=np.array(data[:,1])
-    print("the solution for the problem with this parameters","#_items=",n_items,"//n""capacity_knapsack=",capacity_knapsack,"weight_item=",weight_item,"profit_item=",profit_item,"is:")
-	problems = [knapsack_neglect,knapsack_penalty]
-	for problem in problems:
-		pupib = PupiBinary(fcost=problem, d=4,n=4, nw=.1, alpha=.5, sigma=1, max_eval=50000, viz=viz, capacity_knapsack=11, weight_item=np.array([2,4,6,7]), profit_item=np.array([6,10,12,13]))
-		pupib.optimise()
-		pupib.summary()
-knapsack_instance('f4_l-d_kp_4_11.txt')
+if(False):
+    #### Binary-valued experiments ####
+
+    problems = [oneMax, squareWave, binVal, powSum]
+
+    for i in range(0, nreps):
+        # 100D problems #
+        for problem in problems:
+            pupib = PupiBinary(fcost=problem, d=100, n=40, nw=.1, alpha=.5, sigma=1, max_eval=50000, viz=viz)
+            pupib.optimise()
+            pupib.summary()
+
+        # 400D problems #
+        for problem in problems:
+            pupib = PupiBinary(fcost=problem, d=400, n=20, nw=.1, alpha=.5, sigma=1, max_eval=100000)
+            pupib.optimise()
+            pupib.summary()
+
+
+if(True):
+    #### Combinatorial experiments ####
+    problems = [knapsack_discard,#knapsack_penalty
+                 ]
+    file_tester = ["low_dimensional_.zip","smallcoeff_pisinger.zip","largecoeff_pisinger.zip","hardinstances_pisinger.zip"]
+    for file in file_tester:
+        zf = zipfile.ZipFile(file)
+        name_files = zf.namelist()
+        experiments = []
+        time = []
+        for filename in name_files:
+            d = knapsack_instance(zf,filename)
+            B = np.random.random((10, d)) < .5
+            profits = knapsack_discard(B)
+            experiments.append(profits)
+            time.append(timeit())
+
+        if "low" in file:
+            optimum = np.loadtxt("low_dimensional_optimum.txt", dtype=float)
+        else:
+            optimum = np.zeros(len(experiments))
+            # global kp_data
+            # optimum.append(kp_data["optimum"])
+            # comp_time.append(kp_data["comp_time"])
+        print("Results of ",str(len(name_files)), file, "problems")
+        result=pd.DataFrame({'name':name_files,'Result':experiments,'Optimum':optimum,'Difference in % of optimum':(experiments-optimum)*100/optimum,'Time':time})
+        print(result)
+        result=[]
+#...
