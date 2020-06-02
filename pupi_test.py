@@ -3,9 +3,7 @@ from pupi_class import PupiReal, PupiBinary
 from pupi_bm import *
 import numpy as np
 import time
-from timeit import timeit
 import pandas as pd
-import matplotlib.pyplot as plt
 import zipfile
 
 np.random.seed(int(str(int(time.time() * 1000))[-8:-1]))  # Set random generator seed
@@ -69,31 +67,37 @@ if(False):
 
 
 if(True):
-    #### Combinatorial experiments ####
-    problems = [knapsack_discard,#knapsack_penalty
-                 ]
-    file_tester = ["low_dimensional_.zip","smallcoeff_pisinger.zip","largecoeff_pisinger.zip","hardinstances_pisinger.zip"]
-    for file in file_tester:
-        zf = zipfile.ZipFile(file)
-        name_files = zf.namelist()
-        experiments = []
-        time = []
-        for filename in name_files:
-            d = knapsack_instance(zf,filename)
-            B = np.random.random((10, d)) < .5
-            profits = knapsack_discard(B)
-            experiments.append(profits)
-            time.append(timeit())
 
-        if "low" in file:
-            optimum = np.loadtxt("low_dimensional_optimum.txt", dtype=float)
-        else:
-            optimum = np.zeros(len(experiments))
-            # global kp_data
-            # optimum.append(kp_data["optimum"])
-            # comp_time.append(kp_data["comp_time"])
+    ## Open file .zip to tester##
+
+    file_tester = ["low_dimensional_.zip","smallcoeff_pisinger.zip","largecoeff_pisinger.zip","hardinstances_pisinger.zip"]
+
+    ## Read file´s name in .zip##
+    for file in file_tester:
+        zf = zipfile.ZipFile(file) #abrir el .zip
+        name_files = zf.namelist() #almacenar los nombres de los archivos en el .zip
+        experiments = []  #almacena los resultado del ejercicio para cada archivo
+
+        ##para cada archivo ejecuta el ejercicio##
+        for filename in name_files:
+            d = knapsack_instance(zf,filename)[0]
+            v_optimum=knapsack_instance(zf,filename)[1]
+            time_optimum = knapsack_instance(zf, filename)[2]
+            B = np.random.random((10, d)) < .5
+            t0=time.time()
+            profits_penalty = knapsack_penalty(B)
+            t_penalty = time.time() - t0
+            t0=time.time()
+            profits_discard = knapsack_discard(B)
+            t_discard=time.time()-t0
+            experiments.append([filename,profits_discard,profits_penalty, v_optimum, t_discard,t_penalty,time_optimum])
+
         print("Results of ",str(len(name_files)), file, "problems")
-        result=pd.DataFrame({'name':name_files,'Result':experiments,'Optimum':optimum,'Difference in % of optimum':(experiments-optimum)*100/optimum,'Time':time})
+        result=pd.DataFrame(experiments, columns=['filename','profits_discard','profits_penalty', 'v_optimum', 't_discard','t_penalty','time_optimum'])
+        if 'low' in file:
+            result['v_optimum']=np.loadtxt("low_dimensional_optimum.txt")
+            #result['difference_value']=(result['v_optimum'] - result['profits'])
+        pd.options.display.max_columns = None
         print(result)
-        result=[]
+        experiments=[]
 #...
