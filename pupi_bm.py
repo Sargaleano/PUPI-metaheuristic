@@ -128,7 +128,7 @@ def knapsack_instance(zf,filename):
         profits = np.array(parameters_item_.profits,dtype=float)
     global kp_data
     kp_data = {"d": n_items, "C_max": C_max, "weights": weights, "profits": profits,"v_optimum": v_optimum, "time_optimum":time_optimum}
-    return n_items, v_optimum, time_optimum
+    return filename,n_items, v_optimum, time_optimum
 
 def knapsack_discard(B):
     """ knapsack_discard obtains fitnesses using the KP cost function, except on those candidates violating
@@ -147,7 +147,9 @@ def knapsack_discard(B):
     P = np.sum(np.multiply(profits, B), axis=1)  # Profitability of all candidates
     discard_mask = (C > C_max)  # Filter out those violating the C_max constraint
     P[discard_mask] = -np.Inf  # Discard them
-    return P.max()  # Return best profit
+    #pd.options.display.max_columns = None
+    #print(B[0],C_max,C.min(),P.max())
+    return -P  # Return best profit
 
 def knapsack_penalty(B):
     """ knapsack_discard obtains fitnesses using the KP cost function, except on those candidates violating
@@ -166,4 +168,4 @@ def knapsack_penalty(B):
     P=np.sum(np.multiply(profits, B), axis=1)
     discard_mask = (C > C_max)  # Filter out those violating the C_max constraint
     P[discard_mask] = (C_max-C[discard_mask]) # Penalty them
-    return P.max()  # Return best profit
+    return -P  # Return best profit
