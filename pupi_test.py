@@ -7,8 +7,8 @@ import pandas as pd
 import zipfile
 
 np.random.seed(int(str(int(time.time() * 1000))[-8:-1]))  # Set random generator seed
-viz = True        # Visualisation on
-# viz = False         # Visualisation off
+#viz = True        # Visualisation on
+viz = False         # Visualisation off
 nreps = 1 #5           # Set number of experiment repetitions
 
 if(False):
@@ -71,33 +71,34 @@ if(True):
     ## Open file .zip to tester##
 
     file_tester = ["low_dimensional_.zip","smallcoeff_pisinger.zip","largecoeff_pisinger.zip","hardinstances_pisinger.zip"]
-
+    problems = [knapsack_discard,
+                #knapsack_penalty
+               ]
     ## Read file´s name in .zip##
     for file in file_tester:
         zf = zipfile.ZipFile(file) #abrir el .zip
-        name_files = zf.namelist() #almacenar los nombres de los archivos en el .zip
+        name_files = sorted(zf.namelist()) #almacenar los nombres de los archivos en el .zip
         experiments = []  #almacena los resultado del ejercicio para cada archivo
 
         ##para cada archivo ejecuta el ejercicio##
         for filename in name_files:
-            d = knapsack_instance(zf,filename)[0]
-            v_optimum=knapsack_instance(zf,filename)[1]
-            time_optimum = knapsack_instance(zf, filename)[2]
-            B = np.random.random((10, d)) < .5
-            t0=time.time()
-            profits_penalty = knapsack_penalty(B)
-            t_penalty = time.time() - t0
-            t0=time.time()
-            profits_discard = knapsack_discard(B)
-            t_discard=time.time()-t0
-            experiments.append([filename,profits_discard,profits_penalty, v_optimum, t_discard,t_penalty,time_optimum])
+            do= knapsack_instance(zf,filename)
+            d=do[1]
+            for i in range(0, nreps):
+                for problem in problems:
+                    pupib = PupiBinary(fcost=problem, d=d, n=40, nw=.1, alpha=.5, sigma=1, max_eval=40000, viz=viz)
+                    pupib.optimise()
+                    #pupib.summary(zf,filename)
+                    result=pupib.getResultados()
+                    result=do+result
+                    experiments.append(result)
 
-        print("Results of ",str(len(name_files)), file, "problems")
-        result=pd.DataFrame(experiments, columns=['filename','profits_discard','profits_penalty', 'v_optimum', 't_discard','t_penalty','time_optimum'])
+        table=pd.DataFrame(experiments, columns=['filename', 'd','p_optimum', 't_optimum', 'p.best','seconds','f.cost'])
         if 'low' in file:
-            result['v_optimum']=np.loadtxt("low_dimensional_optimum.txt")
-            #result['difference_value']=(result['v_optimum'] - result['profits'])
+            table['p_optimum']=np.loadtxt("low_dimensional_optimum.txt")
+        table['difference_value'] = (table['p_optimum'] + table['p.best'])
+
+        print('for the problem',file,'the error is of',len(table[table['difference_value'] > 0])*100/len(name_files),'%')
         pd.options.display.max_columns = None
-        print(result)
-        experiments=[]
+        print(table)
 #...
