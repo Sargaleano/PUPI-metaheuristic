@@ -1,38 +1,59 @@
 ## Import libraries ##
-from pupi_class import PupiBinary
+from pupi_class import PupiReal, PupiBinary
 from pupi_bm import *
 import numpy as np
 import time
 import matplotlib.pyplot as plt
 
-## General settings ##
-np.random.seed(int(str(int(time.time() * 1000))[-8:-1]))  # (91680801)  # Set random state for reproducibility
-problems = [oneMax, squareWave, binVal]
-stats = []; nreps = 10
+np.random.seed(int(str(int(time.time() * 1000))[-8:-1]))  # Set random generator seed
+viz = True
+# viz = False
 
-## PupiBinary experiments ##
-for k in range(nreps):
-    for problem in problems:
-        pupi = PupiBinary(fcost=problem, d=64, nw=.1, viz=False)
-        pupi.optimise()
-        stats.append(pupi.getResults())
-        pupi.summary()
-        #[plt.plot(results) for results in pupi.getStats()]; plt.title('PupiReal best/avg./worst: %s (rep=%d)' % (problem.__name__, k)); plt.show()
+#### Continuous-valued experiments ####
 
-## Plots PupiBinary ##
-if False:
-    plt.hist([results[1] for results in stats if results[0]=="oneMax"])
-    plt.title('Best function cost: oneMax (PupiBinary)')
-    plt.show()
-    plt.plot([results[4] for results in stats if results[0]=="oneMax"], marker='o')
-    plt.title('Execution time secs: oneMax (PupiBinary)')
-    plt.show()
-
-print("\n------- PupiBinary: Summary of results --------")
+# 2D problems #
+problems = [sphere, rastrigin, rastrigin_offset, rastrigin_bipolar, rosenbrock, himmelblau]
 for problem in problems:
-    print("Best costs (%s): " % problem.__name__, [results[2] for results in stats if results[0]==problem.__name__])
-    print("Best evals (%s): " % problem.__name__, [results[3] for results in stats if results[0]==problem.__name__])
-    print("Best times (%s): " % problem.__name__, [results[5] for results in stats if results[0]==problem.__name__])
-#print(stats)
+    pupic = PupiReal(fcost=problem, viz=viz)
+    pupic.optimise()
+    pupic.summary()
 
-# pupi = PupiBinary(fcost=oneMax, d = 256, n = 256, nw = .25, alpha = 0.1, sigma = 0.1, max_eval = 120000, stats = False)
+# Eggholder 2D problem has different bounds and therefore step sizes #
+pupic = PupiReal(fcost=eggholder, LB=np.array([-512., -512.]), UB=np.array([512., 512.]), alpha=1, sigma=50, viz=viz)
+pupic.optimise()
+pupic.summary()
+
+# 10D problems #
+d = 10
+UB = np.repeat(5., d); LB = -UB
+problems = [sphere, rastrigin, rastrigin_offset, rastrigin_bipolar]
+for problem in problems:
+    pupic = PupiReal(fcost=problem, LB=LB, UB=UB, max_eval=100000, n=20, nw=.1, alpha=.1, sigma=1)
+    pupic.optimise()
+    pupic.summary()
+
+# 30D problems #
+d = 30
+UB = np.repeat(5., d); LB = -UB
+problems = [sphere, rastrigin, rastrigin_offset, rastrigin_bipolar]
+for problem in problems:
+    pupic = PupiReal(fcost=problem, LB=LB, UB=UB, max_eval=300000, n=20, nw=.1, alpha=.1, sigma=1)
+    pupic.optimise()
+    pupic.summary()
+
+
+#### Binary-valued experiments ####
+
+problems = [oneMax, squareWave, binVal, powSum]
+
+# 100D problems #
+for problem in problems:
+    pupib = PupiBinary(fcost=problem, d=100, n=40, nw=.25, alpha=.1, sigma=1, max_eval=50000, viz=viz)
+    pupib.optimise()
+    pupib.summary()
+
+# 400D problems #
+for problem in problems:
+    pupib = PupiBinary(fcost=problem, d=400, n=20, nw=.1, alpha=.1, sigma=1, max_eval=100000)
+    pupib.optimise()
+    pupib.summary()
