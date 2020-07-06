@@ -72,4 +72,84 @@ def powSum(B):
     """
     d = B.shape[1]
     # In the following line, use dtype=float to avoid overflow when d>=64 bits
+<<<<<<< HEAD
     return -np.sum(np.multiply(np.arange(1, d+1, dtype=np.float)[::-1], B), dtype=np.float, axis=1)
+=======
+    return -np.sum(np.multiply(np.arange(1, d + 1, dtype=np.float)[::-1], B), dtype=np.float, axis=1)
+
+
+############################
+## Combinatorial problems ##
+############################
+
+# Knapsack Problem #
+
+def knapsack_instance(zf,filename):
+    """ knapsack_instance loads from a file the parameters of an instance of KP problem
+        The data is stored in a global dictionary.
+        Arguments:
+        filname -- the name of the file with the instance data
+        Output:
+        kp_data -- a global dictionary containing the parameters of a KP instance
+    """
+    #leer del archivo en el .zip los parámetros de prueba#
+    if "l-d" in filename:
+        parameters = np.loadtxt(zf.open(filename), dtype=float)
+        n_items = int(np.array(parameters[0,0]))
+        C_max = np.full((1, 1), float(parameters[0, 1]))[0]
+        profits = np.array(parameters[1:, 0])
+        weights = np.array(parameters[1:, 1])
+        v_optimum = 0
+        time_optimum = 0
+    else:
+        general_parameters = pd.read_csv(zf.open(filename), delimiter=" ", nrows=4)
+        n_items = int(general_parameters.iloc[0])
+        C_max = np.array(general_parameters.iloc[1],dtype=float)
+        v_optimum = np.array(general_parameters.iloc[2])
+        time_optimum = np.array(general_parameters.iloc[3])
+        parameters_item_ = pd.read_csv(zf.open(filename), delimiter=",", nrows=n_items, skiprows=5,
+                            names=["n","profits", "weights","B_optimum"])
+        weights = np.array(parameters_item_.weights,dtype=float)
+        profits = np.array(parameters_item_.profits,dtype=float)
+    global kp_data
+    kp_data = {"d": n_items, "C_max": C_max, "weights": weights, "profits": profits,"v_optimum": v_optimum, "time_optimum":time_optimum}
+    return n_items, v_optimum, time_optimum
+
+def knapsack_discard(B):
+    """ knapsack_discard obtains fitnesses using the KP cost function, except on those candidates violating
+        the capacity constraint. The unfeasible candidates are "discarded" by setting their fitness to -Inf.
+        Arguments:
+        B -- a population of bitstrings of length d
+        kp_data -- a global dictionary containing the parameters of a KP instance
+    """
+    # First we need to retrieve the KP instance #
+    global kp_data
+    C_max = kp_data["C_max"]
+    weights = kp_data["weights"]
+    profits = kp_data["profits"]
+    # Now compute the costs obtained with each candidate
+    C = np.sum(np.multiply(weights, B), axis=1)  # Capacity of all candidates
+    P = np.sum(np.multiply(profits, B), axis=1)  # Profitability of all candidates
+    discard_mask = (C > C_max)  # Filter out those violating the C_max constraint
+    P[discard_mask] = -np.Inf  # Discard them
+    return P.max()  # Return best profit
+
+def knapsack_penalty(B):
+    """ knapsack_discard obtains fitnesses using the KP cost function, except on those candidates violating
+        the capacity constraint. The unfeasible candidates are "penalty" by setting their fitness to -Inf.
+        Arguments:
+        B -- a population of bitstrings of length d
+        kp_data -- a global dictionary containing the parameters of a KP instance
+    """
+    # First we need to retrieve the KP instance #
+    global kp_data
+    C_max = kp_data["C_max"]
+    weights = kp_data["weights"]
+    profits = kp_data["profits"]
+    # Now compute the costs obtained with each candidate
+    C = np.sum(np.multiply(weights, B), axis=1)  # Capacity of all candidates
+    P=np.sum(np.multiply(profits, B), axis=1)
+    discard_mask = (C > C_max)  # Filter out those violating the C_max constraint
+    P[discard_mask] = (C_max-C[discard_mask]) # Penalty them
+    return P.max()  # Return best profit
+>>>>>>> parent of 2202868... penalty
