@@ -152,4 +152,7 @@ def knapsack_penalty(B):
     discard_mask = (C > C_max)  # Filter out those violating the C_max constraint
     P[discard_mask] = (C_max-C[discard_mask]) # Penalty them
     return P.max()  # Return best profit
+<<<<<<< HEAD
+>>>>>>> parent of 2202868... penalty
+=======
 >>>>>>> parent of 2202868... penalty
