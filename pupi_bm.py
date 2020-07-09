@@ -73,6 +73,7 @@ def powSum(B):
     d = B.shape[1]
     # In the following line, use dtype=float to avoid overflow when d>=64 bits
 <<<<<<< HEAD
+<<<<<<< HEAD
     return -np.sum(np.multiply(np.arange(1, d+1, dtype=np.float)[::-1], B), dtype=np.float, axis=1)
 =======
     return -np.sum(np.multiply(np.arange(1, d + 1, dtype=np.float)[::-1], B), dtype=np.float, axis=1)
@@ -156,3 +157,6 @@ def knapsack_penalty(B):
 >>>>>>> parent of 2202868... penalty
 =======
 >>>>>>> parent of 2202868... penalty
+=======
+    return -np.sum(np.multiply(np.arange(1, d+1, dtype=np.float)[::-1], B), dtype=np.float, axis=1)
+>>>>>>> parent of 5cb8f0b... add read instances pisings
