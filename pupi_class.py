@@ -105,7 +105,7 @@ class PupiReal():
     def getResults(self):
         return self.fcost.__name__, self.d, self.fbest, self.ibest, self.xbest, \
                self.toc, self.n, self.nw, self.alpha, self.sigma, self.max_eval, self.mode
-
+  
     ## Get algorithm stats ##
     def getStats(self):
         return self.fmins, self.favgs, self.fmaxs
@@ -155,6 +155,9 @@ class PupiBinary(PupiReal):
     def getResults(self):
         return self.fcost.__name__, self.d, self.fbest, self.ibest, self.gpm(self.xbest), \
                self.toc, self.n, self.nw, self.alpha, self.sigma, self.max_eval, self.mode
+    
+    def getResultsKnapsack(self):
+        return self.fbest, self .toc, self.fcost.__name__
 
     ## Visualise one iteration of optimisation algorithm ##
     def vizIteration(self, i, P, followers, walkers, leader):
