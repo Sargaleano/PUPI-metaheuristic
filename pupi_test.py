@@ -81,7 +81,7 @@ if(True):
             for problem in problems:
                 pupib = PupiBinary(fcost=problem, d=d, n=40, nw=.1, alpha=.5, sigma=1, max_eval=40000, viz=viz)
                 pupib.optimise()
-                result=pupib.getResultsknapsack()
+                result=pupib.getResultsKnapsack()
                 result=do+result
                 experiments.append(result)
 
