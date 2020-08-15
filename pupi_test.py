@@ -66,9 +66,7 @@ if(True):
     ## Open file .zip to tester##
 
     file_tester = ["low_dimensional_.zip","smallcoeff_pisinger.zip","largecoeff_pisinger.zip","hardinstances_pisinger.zip"]
-    problems = [#knapsack_discard,
-                knapsack_penalty
-    ]
+    problems = [knapsack_discard, knapsack_penalty]
     ## Read file´s name in .zip##
     for file in file_tester:
         zf = zipfile.ZipFile(file) 
