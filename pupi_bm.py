@@ -145,5 +145,5 @@ def knapsack_penalty(B):
     C = np.sum(np.multiply(weights, B), axis=1)  # Capacity of all candidates
     P=np.sum(np.multiply(profits, B), axis=1)
     discard_mask = (C > C_max)  # Filter out those violating the C_max constraint
-    P[discard_mask] = (C_max-C[discard_mask]) # Penalty them
+    P[discard_mask] = -(np.sum(B) * abs(C[discard_mask] - C_max)) # Penalty them
     return -P  # Return best profit
