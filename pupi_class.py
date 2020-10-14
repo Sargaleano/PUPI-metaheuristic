@@ -1,3 +1,17 @@
+'''
+PUPI algorithm is a method for unconstrained cost function optimisation
+inspired in the foraging behaviour of urban park pigeons.
+This file includes two algorithms: PupiReal and PupiBinary for numerical
+and binary optimisation respectively.
+
+(c) 2020 - v3.0 (October/2020)
+Changes in this version:
+ - Starvation mode, including famine and disband with Levy flights
+ - Adaptive step for followers
+
+License: GPLv3 (see https://www.gnu.org/licenses/gpl-3.0.txt)
+'''
+
 ## Python 2.7 compatibility ##
 from __future__ import print_function
 import matplotlib
@@ -8,13 +22,6 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 from pupi_bm import *
-
-'''
-PUPI algorithm is a method for unconstrained cost function optimisation 
-inspired in the foraging behaviour of urban park pigeons.
-(c) 2020 - v2.0
-License: CC BY-SA 4.0 
-'''
 
 ## PUPI algorithm: Real-valued (continuous) problems class implementation  ##
 class PupiReal():
@@ -29,7 +36,7 @@ class PupiReal():
         self.n = n                   # Population size (number of pigeons)
         self.nw = nw                 # Rate of walkers pigeons in the population
         self.max_eval = max_eval     # Max number of cost function evaluations allowed
-        self.famine = .2*max_eval    # Max number of evaluations with no fitness improvement (famine trigger)
+        self.famine = (.2 if (self.d>=10) else .01)*max_eval  # Max number of evaluations triggering famine
         self.alpha = alpha           # Step size for followers move
         self.sigma = sigma           # Step size for walkers move
         self.mode = mode             # Boundary movement mode (clipped or toroid)
@@ -43,10 +50,10 @@ class PupiReal():
 
     ## Core function: Assign pigeons roles, depending on availability of food supply (starvation) ##
     def setRoles(self, starvation=False):
-        if not starvation:    # Flocking phase (split flock into followers+walkers)
+        if not starvation:           # Flocking phase (split flock into followers+walkers)
             walkers = np.random.choice(self.n, int(self.n * self.nw), replace=False)
             followers = np.setdiff1d(range(self.n), walkers)
-        else:                 # Stagnation phase (disband, let walkers only)
+        else:                        # Starvation phase (disband, let walkers only)
             walkers, followers = np.arange(self.n), []
         return followers, walkers
 
@@ -58,12 +65,22 @@ class PupiReal():
         followers, walkers = self.setRoles(starvation=False)
         return P, followers, walkers
 
+    ## Core function: Update the value of the parameter alpha (followers step) ##
+    def adaptiveStep(self, dispersion):
+        if dispersion < (self.UB[0] * 0.5):
+            self.alpha = (1 - np.exp(-dispersion))
+        else:
+            self.alpha = 0.7 #0.9
+
     ## Core function: Follower move (bring followers towards leader) ##
     def follow(self, X, Xl, sigma=0.001):
-         for i in range(len(X)):                # len(X) is the number of follower pigeons
+        dispersion = 0
+        for i in range(len(X)):                 # len(X) is the number of follower pigeons
             j = np.random.choice(self.d, 1)[0]  # Choose a coordinate to update
-            X[i, j] = np.clip(X[i, j] + self.alpha * (Xl[j] - X[i, j]) + sigma * np.random.randn(), self.LB[j], self.UB[j])
-         return X
+            deltax = Xl[j] - X[i, j]
+            X[i, j] = np.clip(X[i, j] + self.alpha * (deltax) + sigma * np.random.randn(), self.LB[j], self.UB[j])
+            dispersion += abs(deltax)
+        return X, dispersion
 
     ## Core function: Walkers move (wander walkers around, either in clipped or toroid mode) ##
     def walk(self, X):
@@ -84,7 +101,6 @@ class PupiReal():
             for i in range(len(X)):
                 j = np.random.choice(self.d, 1)[0]  # Choose a coordinate to update
                 X[i, j] = np.clip((X[i, j] + self.sigma * self.randLevy(1.9)), self.LB[j], self.UB[j])
-                # X[i, j] = np.clip((X[i, j] + self.sigma * self.randLevy(1.2)), self.LB[j], self.UB[j])
         elif self.mode == 'toroid':
             for i in range(len(X)):
                 j = np.random.choice(self.d, 1)[0]  # Choose a coordinate to update
@@ -98,11 +114,11 @@ class PupiReal():
 
     ## Core function: Genotype-phenotype mapping function, when different to direct mapping ##
     def gpm(self, P):
-        return P                        # Direct mapping: Phenotype is the same genotype
+        return P                                    # Direct mapping: Phenotype is the same genotype
 
     ## Core function: Print algorithm results ##
     def summary(self):
-        print("\n%s\nProblem: %s (d=%d)\nEllapsed time: %.2fs \nBest cost: %.5f \nFound after: %d evaluations " \
+        print("\n%s\nProblem: %s (d=%d)\nEllapsed time: %.2fs \nBest cost: %.20f \nFound after: %d evaluations " \
               % ("-" * 80, self.fcost.__name__, self.d, self.toc, self.fbest, self.ibest))
         print("Best solution (genotype): ", list(map(float, ["%.3f" % v for v in self.xbest])))
         print("Best solution (phenotype): ", self.gpm(self.xbest))
@@ -119,18 +135,20 @@ class PupiReal():
             leader = self.getLeader(F)              # Find leader pigeon
             if F[leader] < self.fbest:              # Update best solution found (minimisation)
                 self.fbest, self.xbest, self.ibest = F[leader], np.copy(P[leader]), i
-                hunger = 0                            # Since better solution found, reset idleness counter
+                hunger = 0                          # Since better solution found, reset idleness counter
             if not starvation:
-                P[followers] = self.follow(P[followers], P[leader])              # Move followers
+                P[followers], dx = self.follow(P[followers], P[leader])          # Move followers
                 P[walkers] = self.walk(P[walkers])                               # Move walkers
                 P[0] = np.copy(self.xbest); P[0] = self.walk(P[[0]])             # Enforce elitism
+                self.adaptiveStep(dx)                                            # Update alpha based on flock dispersion
                 hunger += self.n                                                 # Increase flock hungriness
                 starvation = (hunger >= self.famine)                             # Check if flock is starving
                 if starvation:
                     followers, walkers = self.setRoles(starvation=True)          # Start starvation (disband) phase
             else:
                 P[walkers] = self.disband(P[walkers])                            # Disband pigeons
-                hunger -= self.n                                                 # Decrease flock hungriness
+                hunger -= self.d                                                 # Decrease flock hungriness (depends on dim)
+                # hunger -= (1 if (self.d>=20) else .1) * self.n                   # Decrease flock hungriness (depends on dim)
                 starvation = (hunger > 0)                                        # End starvation when no hungry anymore
                 if not starvation:
                     followers, walkers = self.setRoles(starvation=False)         # Restore foraging phase
@@ -142,7 +160,7 @@ class PupiReal():
                 self.vizIteration(i, P, followers, walkers, leader)
         self.toc = time.time() - tic                # Stop and record execution timer
 
-    ## Ancillary function: Generate a Levy distributed variate. Note: 1 < beta < 2 ##
+    ## Ancillary function: Generate a Levy distributed variate. NB: 1 < beta < 2 ##
     def randLevy(self, beta):
         num = np.random.gamma(1 + beta) * np.sin(np.pi * beta / 2)
         den = np.random.gamma((1 + beta) / 2) * beta * 2 ** ((beta - 1) / 2)
@@ -193,6 +211,7 @@ class PupiBinary(PupiReal):
     ## Core function: Genotype-phenotype mapping function: Maps real unit-interval to binary values ##
     def gpm(self, P):
         return (P >= .5)*1     # Apply threshold and cast True/False values to 1/0
+        # return (np.random.rand(self.n, self.d) <= P)*1     # Apply threshold and cast True/False values to 1/0
 
     ## Ancillary function: Get algorithm results ##
     def getResults(self):
