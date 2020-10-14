@@ -7,7 +7,7 @@ License: GPLv3 (see https://www.gnu.org/licenses/gpl-3.0.txt)
 '''
 
 ## Import libraries ##
-from pupi_class import PupiReal, PupiBinary
+from pupi_class import PupiReal, PupiBinary, PupiEnsemble
 from pupi_bm import *
 import numpy as np
 import time
@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 np.random.seed(int(str(int(time.time() * 1000))[-8:-1]))  # Set random generator seed
 # viz = True        # Visualisation on
 viz = False         # Visualisation off
-nreps = 10           # Set number of experiment repetitions
+nreps = 10          # Set number of experiment repetitions
 
 if(True):
     #### Continuous-valued experiments ####
@@ -70,6 +70,12 @@ if(True):
         # 400D problems #
         for problem in problems:
             pupib = PupiBinary(fcost=problem, d=400, n=20, nw=.1, alpha=.5, sigma=1, max_eval=100000)
+            pupib.optimise()
+            pupib.summary()
+
+        # 1000D problems #
+        for problem in problems:
+            pupib = PupiEnsemble(fcost=problem, d=1000, n=10, nw=.1, alpha=.5, sigma=1, max_eval=50000)
             pupib.optimise()
             pupib.summary()
 
