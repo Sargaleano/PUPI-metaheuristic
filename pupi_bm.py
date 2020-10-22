@@ -15,36 +15,101 @@ import numpy as np
 ##########################
 
 def sphere(X):
+	""" Landscape propierties: Separable, Scalable, Differentiable, Multimodal, Continuous.
+		Domain: [-5.12, 5.12].
+		Dimensions: d >= 2.
+		Optimal function value: 0.
+		Optimal coordinates: (0, ..., 0).
+		Arguments:
+        X -- A population of d-dimensional vector coordinates.
+	"""
     return np.sum(X**2, axis=1)
 
 def rosenbrock(X):
+	""" Landscape propierties: Non-Separable, Scalable, Differentiable, Unimodal, Continuous.
+		Domain: [-5.12, 5.12].
+		Dimensions: d = 2.
+		Optimal function value: 0.
+		Optimal coordinates: (1, 1).
+		Arguments:
+        X -- A population of d-dimensional vector coordinates.
+	"""
     return (1 - X[:,0])**2 + 100 * (X[:,1] - (X[:,0]**2))**2
 
 def rastrigin(X):
+	""" Landscape propierties: Separable, Differentiable, Multimodal, Continuous.
+		Domain: [-5.12, 5.12].
+		Dimensions: d >= 2.
+		Optimal function value: 0.
+		Optimal coordinates: (0, ..., 0).
+		Arguments:
+        X -- A population of d-dimensional vector coordinates.
+	"""
     d = X.shape[1]      # Search space dimensionality
     return np.sum((X**2 - 10*np.cos(2*np.pi*X)), axis=1) + 10*d
 
 def rastrigin_bipolar(X):
+	""" Landscape propierties: Separable, Differentiable, Multimodal, Continuous.
+		Domain: [-5.12, 5.12].
+		Dimensions: d >= 2.
+		Optimal function value: 0.
+		Optimal coordinates: (-1, 1, -1, 1, ...).
+		Arguments:
+        X -- A population of d-dimensional vector coordinates.
+	"""
     d = X.shape[1]      # Search space dimensionality
-    return np.sum(((X-(2*(np.array(range(0,d))%2)-1))**2 - 10*np.cos(2*np.pi*(X-(2*(np.array(range(0,d))%2)-1)))), axis=1) + 10*d
+    return np.sum(((X-(2*(np.array(range(0, d)) % 2)-1))**2
+            - 10*np.cos(2*np.pi*(X-(2*(np.array(range(0, d)) % 2)-1)))), axis=1) + 10*d
 
 def rastrigin_offset(X):
+	""" Landscape propierties: Separable, Differentiable, Multimodal, Continuous.
+		Domain: [-5.12, 5.12].
+		Dimensions: d >= 2.
+		Optimal function value: 0.
+		Optimal coordinates: (1.123, ..., 1.123).
+		Arguments:
+        X -- A population of d-dimensional vector coordinates.
+	"""
     d = X.shape[1]      # Search space dimensionality
     return np.sum(((X-1.123)**2 - 10*np.cos(2*np.pi*(X-1.123))), axis=1) + 10*d
 
 def himmelblau(X):
-    return (X[:,0]**2 + X[:,1] - 11)**2 + (X[:,0] + X[:,1]**2 - 7)**2
+	""" Landscape propierties: Non-Separable, Non-Scalable, Differentiable, Multimodal, Continuous.
+		Domain: [-5.12,5.12].
+		Dimensions: d = 2.
+		Optimal function value: 0.
+		Optimal coordinates: (3,2),(−2.8051,3.2831),(−3.7793,−3.2831),(3.5844,−1.8481).
+		Arguments:
+        X -- A population of d-dimensional vector coordinates.
+	"""
+    return (X[:, 0]**2 + X[:, 1] - 11)**2 + (X[:, 0] + X[:, 1]**2 - 7)**2
 
 def eggholder(X):
+	""" Landscape propierties: Non-Separable, Scalable, Differentiable, Multimodal, Continuous.
+		Domain: [-512, 512].
+		Dimensions: d = 2.
+		Optimal function value: −959.640662.
+		Optimal coordinates: (512, 404.2319).
+		Arguments:
+        X -- A population of d-dimensional vector coordinates.
+	"""
     Z = X[:,1]+47
-    return (-Z * np.sin(np.sqrt((np.abs(X[:,0]/2 + Z)))) \
-            -X[:,0] * np.sin(np.sqrt((np.abs(X[:,0] - Z))))) #+ 959.640662720851
+    return (-Z * np.sin(np.sqrt((np.abs(X[:, 0]/2 + Z)))) \
+            -X[:, 0] * np.sin(np.sqrt((np.abs(X[:, 0] - Z))))) #+ 959.640662720851
 
 ############################################
 ## Additional real-valued problems (v3.0) ##
 ############################################
 
 def ackley(x):
+	""" Landscape propierties: Separable, Non-Scalable, Differentiable, Unimodal, Continuous.
+		Domain: [-32,32].
+		Dimensions: d >= 2.
+		Optimal function value: 0.
+		Optimal coordinates: (0, ..., 0).
+		Arguments:
+        x -- A population of d-dimensional vector coordinates.
+	"""
     d = x.shape[1]     # Search space dimensionality
     return (-20.0 * np.exp(-0.2 * np.sqrt((1 / d) * (x ** 2).sum(axis=1)))
             - np.exp((1 / float(d)) * np.cos(2 * np.pi * x).sum(axis=1))
@@ -52,14 +117,38 @@ def ackley(x):
             + np.exp(1))
 
 def beale(x):
+	""" Landscape propierties: Non-Separable, Non-Scalable, Differentiable, Unimodal, Continuous.
+		Domain: [-4.5, 4.5].
+		Dimensions: d = 2.
+		Optimal function value: 0.
+		Optimal coordinates: (3, 0.5).
+		Arguments:
+        x -- A population of d-dimensional vector coordinates.
+	"""
     return ((1.5 - x[:, 0] + x[:, 0] * x[:, 1]) ** 2.0
             + (2.25 - x[:, 0] + x[:, 0] * x[:, 1] ** 2.0) ** 2.0
             + (2.625 - x[:, 0] + x[:, 0] * x[:, 1] ** 3.0) ** 2.0)
-
+			
 def booth(x):
+	""" Landscape propierties: Non-Separable, Non-Scalable, Differentiable, Unimodal, Continuous.
+		Domain: [-10, 10].
+		Dimensions: d = 2.
+		Optimal function value: 0.
+		Optimal coordinates: (1, 3).
+		Arguments:
+        x -- A population of d-dimensional vector coordinates.
+	"""
     return (x[:, 0] + 2 * x[:, 1] - 7) ** 2.0 + (2 * x[:, 0] + x[:, 1] - 5) ** 2.0
 
 def crossintray(x):
+	""" Landscape propierties: Non-Separable, Non-Scalable, Differentiable, Multimodal, Continuous.
+		Domain: [-10, 10].
+		Dimensions: d = 2.
+		Optimal function value: −2.06261218.
+		Optimal coordinates: (±1.3494067,±1.3494067).
+		Arguments:
+        x -- A population of d-dimensional vector coordinates.
+	"""
     return -0.0001 * np.power(
         np.abs(
             np.sin(x[:, 0])
@@ -68,26 +157,59 @@ def crossintray(x):
         )
         + 1,
         0.1,)
-
+ 
 def easom(x):
+	""" Landscape propierties: Separable, Non-Scalable, Differentiable, Multimodal, Continuous.
+		Domain: [-100, 100].
+		Dimensions: d = 2.
+		Optimal function value: -1.
+		Optimal coordinates: (π, π).
+		Arguments:
+        x -- A population of d-dimensional vector coordinates.
+	"""
     return (-1
             * np.cos(x[:, 0])
             * np.cos(x[:, 1])
             * np.exp(-1 * ((x[:, 0] - np.pi) ** 2 + (x[:, 1] - np.pi) ** 2)))
 
 def goldstein(x):
+	""" Landscape propierties: Non-Separable, Non-Scalable, Differentiable, Multimodal, Continuous.
+		Domain: [-2, 2].
+		Dimensions: d = 2.
+		Optimal function value: 3.
+		Optimal coordinates: (0, -1).
+		Arguments:
+        x -- A population of d-dimensional vector coordinates.
+	"""
     return (1 + (x[:, 0] + x[:, 1] + 1) ** 2.0 * (19 - 14 * x[:, 0] + 3 * x[:, 0] ** 2.0
                                                   - 14 * x[:, 1] + 6 * x[:, 0] * x[:, 1] + 3 * x[:, 1] ** 2.0)) \
         * (30 + (2 * x[:, 0] - 3 * x[:, 1]) ** 2.0 * (18 - 32 * x[:, 0] + 12 * x[:, 0] ** 2.0 + 48 * x[:, 1]
                                                       - 36 * x[:, 0] * x[:, 1] + 27 * x[:, 1] ** 2.0))
 
+
 def holdertable(x):
+	""" Landscape propierties: Non-Separable, Non-Scalable, Differentiable, Multimodal, Continuous.
+		Domain: [-10, 10].
+		Dimensions: d = 2.
+		Optimal function value: −19.2085.
+		Optimal coordinates: (±8.05502, ±9.66459).
+		Arguments:
+        X -- A population of d-dimensional vector coordinates.
+	"""
     return -np.abs(
         np.sin(x[:, 0])
         * np.cos(x[:, 1])
         * np.exp(np.abs(1 - np.sqrt(x[:, 0] ** 2 + x[:, 1] ** 2) / np.pi)))
 
 def levy(x):
+	""" Landscape propierties: Non-Separable, Non-Scalable, Differentiable, Unimodal, Continuous.
+		Domain: [-10, 10].
+		Dimensions: d >= 2.
+		Optimal function value: 0.
+		Optimal coordinates: (1, ..., 1).
+		Arguments:
+        X -- A population of d-dimensional vector coordinates.
+	"""
     mask = np.full(x.shape, False)
     mask[:, -1] = True
     masked_x = np.ma.array(x, mask=mask)
@@ -100,62 +222,181 @@ def levy(x):
             + (w_[:, d_] - 1) ** 2.0 * (1 + np.sin(2 * np.pi * w_[:, d_]) ** 2.0))
 
 def matyas(x):
+	""" Landscape propierties: Non-Separable, Non-Scalable, Differentiable, Unimodal, Continuous.
+		Domain: [-10, 10].
+		Dimensions: d = 2.
+		Optimal function value: 0.
+		Optimal coordinates: (0, 0).
+		Arguments:
+        x -- A population of d-dimensional vector coordinates.
+	"""
     return 0.26 * (x[:, 0] ** 2.0 + x[:, 1] ** 2.0) - 0.48 * x[:, 0] * x[:, 1]
 
 def schaffer2(x):
+	""" Landscape propierties: Non-Separable, Non-Scalable, Differentiable, Multimodal, Continuous.
+		Domain: [-100, 100].
+		Dimensions: d = 2.
+		Optimal function value: 0.
+		Optimal coordinates: (0, 0).
+		Arguments:
+        x -- A population of d-dimensional vector coordinates.
+	"""
     return 0.5 + ((np.sin(x[:, 0] ** 2.0 - x[:, 1] ** 2.0) ** 2.0 - 0.5)
                / ((1 + 0.001 * (x[:, 0] ** 2.0 + x[:, 1] ** 2.0)) ** 2.0))
 
 def threehump(x):
+	""" Landscape propierties: Non-Separable, Non-Scalable, Differentiable, Multimodal, Continuous.
+		Domain: [-5, 5].
+		Dimensions: d = 2.
+		Optimal function value: 0.
+		Optimal coordinates: (0, 0).
+		Arguments:
+        x -- A population of d-dimensional vector coordinates.
+	"""
     return 2 * x[:, 0] ** 2 - 1.05 * (x[:, 0] ** 4) + (x[:, 0] ** 6) / 6 + x[:, 0] * x[:, 1] + x[:, 1] ** 2
 
 def bohachevsky1(x):
+	""" Landscape propierties: Separable, Non-Scalable, Differentiable, Multimodal, Continuous.
+		Domain: [-100, 100].
+		Dimensions: d = 2.
+		Optimal function value: 0.
+		Optimal coordinates: (0, 0).
+		Arguments:
+        x -- A population of d-dimensional vector coordinates.
+	"""
     return x[:, 0] ** 2.0 + 2.0 * x[:, 1] ** 2.0 - 0.3 * np.cos(3 * np.pi * x[:, 0]) \
            - 0.4 * np.cos(4 * np.pi * x[:, 1]) + 0.7
 
 def zakharov(x):
+	""" Landscape propierties: Non-Separable, Scalable, Differentiable, Multimodal, Continuous.
+		Domain: [-5, 10].
+		Dimensions: d >= 2.
+		Optimal function value: 0.
+		Optimal coordinates: (0, ..., 0).
+		Arguments:
+        x -- A population of d-dimensional vector coordinates.
+	"""
     d = x.shape[1]		# Search space dimensionality
     return np.sum(x ** 2, axis=1) + (0.5 * np.sum(np.arange(1, d+1) * x, axis=1)) ** 2 \
            + (0.5 * np.sum(np.arange(1, d+1) * x, axis=1)) ** 4
-
+		   
 def dixonprice(x):
+	""" Landscape propierties: Non-Separable, Scalable, Differentiable, Unimodal, Continuous.
+		Domain: [-10, 10].
+		Dimensions: d >= 2.
+		Optimal function value: 0.
+		Optimal coordinates: x_i = (2^(2^i -2) / 2^i).
+		Arguments:
+        x -- A population of d-dimensional vector coordinates.
+	"""
     d = x.shape[1]		# Search space dimensionality
     return (x[:, 0] - 1) ** 2 + np.sum(np.arange(2, d+1) * (2.0 * x[:, 1:] ** 2.0 - x[:, -1]) ** 2.0, axis=1)
 
 def michalewicz(x):
+	""" Landscape propierties: Multimodal.
+		Domain: [0, π].
+		Dimensions: d >= 2.
+		Optimal function value: When d = 2: −1.8013; When d = 5: −4.687658, When d = 10: −9.66015.
+		Optimal coordinates: When d = 2: (2.20, 1.57).
+		Arguments:
+        x -- A population of d-dimensional vector coordinates.
+	"""
     d = x.shape[1]		# Search space dimensionality
     return -np.sum(np.sin(x) * (np.sin( np.arange(1, d) * x ** 2 / np.pi)) ** 20, axis=1)
 
 def mishra3(x):
+	""" Landscape propierties: Non-Separable, Non-Scalable, Differentiable, Multimodal, Continuous.
+		Domain: [-10, 10].
+		Dimensions: d = 2.
+		Optimal function value: −0.18467.
+		Optimal coordinates: (-10, -10).
+		Arguments:
+        x -- A population of d-dimensional vector coordinates.
+	"""
     return np.sqrt(np.abs(np.cos(np.sqrt(np.abs(x[:, 0] ** 2 + x[:, 1] ** 2))))) + 0.01 * (x[:, 0] + x[:, 1])
 
 def mishra5(x):
+	""" Landscape propierties: Non-Separable, Non-Scalable, Differentiable, Multimodal, Continuous.
+		Domain: [-10, 10].
+		Dimensions: d = 2.
+		Optimal function value: −1.019829.
+		Optimal coordinates: (−1.98682, −10).
+		Arguments:
+        x -- A population of d-dimensional vector coordinates.
+	"""
     return (np.sin((np.cos(x[:, 0]) + np.cos(x[:, 1])) ** 2) ** 2
             + np.cos((np.sin(x[:, 0]) + np.sin(x[:, 1])) ** 2) ** 2 + x[:, 0]) ** 2 + 0.01 * (x[:, 0] + x[:, 1])
 
 def mishra6(x):
+	""" Landscape propierties: Non-Separable, Non-Scalable, Differentiable, Multimodal, Continuous.
+		Domain: [-10, 10].
+		Dimensions: d = 2.
+		Optimal function value: −2.28395.
+		Optimal coordinates: (2.88631, 1.82326).
+		Arguments:
+        x -- A population of d-dimensional vector coordinates.
+	"""
     a = (np.cos(x[:, 0]) + np.cos(x[:, 1])) ** 2
     b = (np.sin(x[:, 0]) + np.sin(x[:, 1])) ** 2
     c = 0.1 * ((x[:, 0] - 1) ** 2 + (x[:, 1] - 1) ** 2)
     return c - np.log((np.sin(a) ** 2 - np.cos(b) ** 2 + x[:, 0]) ** 2)
 
-
 def dropwave(x):
+	""" Landscape propierties: Multimodal, Continuous.
+		Domain: [-5.12, 5.12].
+		Dimensions: d = 2.
+		Optimal function value: -1.
+		Optimal coordinates: (0, 0).
+		Arguments:
+        x -- A population of d-dimensional vector coordinates.
+	"""
     return - (1 + np.cos(12 * np.sqrt(np.sum(x**2, axis=1)))) / (0.5 * (np.sum(x**2, axis=1)) + 2)
 
 def hosaki(x):
+	""" Landscape propierties: Non-Separable, Non-Scalable, Differentiable, Multimodal, Continuous.
+		Domain: [0, 10].
+		Dimensions: d = 2.
+		Optimal function value: −2.345811.
+		Optimal coordinates: (4, 2).
+		Arguments:
+        x -- A population of d-dimensional vector coordinates.
+	"""
     return (1 - 8 * x[:, 0] + 7 * x[:, 0] ** 2 - (7 / 3) * x[:, 0] ** 3 + - (1 / 4) * x[:, 0] ** 4) \
            * (x[:, 1] ** 2) * np.exp(-x[:, 0])
-
+		   
 def damavandi(x):
+	""" Landscape propierties: Non_Separable, Non-Scalable, Differentiable, Multimodal, Continuous.
+		Domain: [0, 14].
+		Dimensions: d = 2.
+		Optimal function value: 0.
+		Optimal coordinates: (2,2).
+		Arguments:
+        x -- A population of d-dimensional vector coordinates.
+	"""
     return (1 - np.abs((np.sin(np.pi * (x[:, 0] - 2)) * np.sin(np.pi * (x[:, 1] - 2))) /
                        (np.pi ** 2 * ((x[:, 0] - 2) * (x[:, 1] - 2)))) ** 5) \
            * (2 + (x[:, 0] - 7) ** 2 + 2 * (x[:, 1] - 7) ** 2)
 
 def parsopoulos(x):
+	""" Landscape propierties: Separable, Scalable, Differentiable, Multimodal, Continuous.
+		Domain: [-5, 5].
+		Dimensions: d = 2.
+		Optimal function value: 0.
+		Optimal coordinates: 12 different pair coordinates.
+		Arguments:
+        x -- A population of d-dimensional vector coordinates.
+	"""
     return  np.cos(x[:, 0]) ** 2 + np.sin(x[:, 1]) ** 2
 
 def vincent(x):
+	""" Landscape propierties: Multimodal.
+		Domain: [0.25, 10].
+		Dimensions: d >= 2.
+		Optimal function value: -d.
+		Optimal coordinates: x_i = 7.70628098.
+		Arguments:
+        x -- A population of d-dimensional vector coordinates.
+	"""
     return -np.sum(np.sin(10 * np.log(x)), axis=1)
 
 #####################
